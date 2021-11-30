@@ -16,6 +16,17 @@ class Course::StatisticsController < Course::ComponentController
     @staffs = CourseUser.order_by_average_marking_time(@staffs)
   end
 
+  def all_submissions
+    respond_to do |format|
+      format.html {}
+      format.json do
+        @assessments = current_course.assessments.calculated(:maximum_grade).includes([{tab: :category}])
+        @submissions = Course::Assessment::Submission.where('assessment_id IN (?)', @assessments.pluck(:id)).calculated(:log_count, :graded_at).includes(:answers, {assessment: :questions})
+        @course_users = current_course.course_users.students.order_phantom_user.order_alphabetically.includes(:user)
+      end
+    end
+  end
+
   private
 
   def authorize_read_statistics!

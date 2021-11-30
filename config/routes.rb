@@ -374,6 +374,7 @@ Rails.application.routes.draw do
 
       get 'statistics/student'
       get 'statistics/staff'
+      get 'statistics/all_submissions'
 
       scope module: :video do
         resources :videos do

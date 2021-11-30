@@ -78,6 +78,7 @@ gem 'docker-api'
 group :development do
   # Spring speeds up development by keeping your application running in the background.
   # Read more: https://github.com/rails/spring
+  gem 'rack-mini-profiler'
   gem 'spring', platforms: [:ruby]
   gem 'listen'
 

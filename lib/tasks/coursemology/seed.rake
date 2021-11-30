@@ -88,6 +88,22 @@ namespace :coursemology do
         assessment.published = true
         assessment.save!
       end
+
+      # Course with many students
+      course4 = FactoryBot.create(:course, :published, :enrollable, title: 'Enrollable Course (Many students)')
+
+      students = FactoryBot.create_list(:course_student, 700, course: course4)
+      FactoryBot.create_list(:course_teaching_assistant, 30, course: course4)
+      FactoryBot.create_list(:course_manager, 5, course: course4)
+
+      assessments = FactoryBot.create_list(:assessment, 10, :published_with_all_question_types,
+        course: course4, title: 'Published, All Question Types')
+
+      assessments.each do |assessment|
+        students.each do |student|
+          FactoryBot.create(:submission, :graded, assessment: assessment, creator: student.user, course: course4)
+        end
+      end
     end
   end
 end

@@ -210,10 +210,14 @@ class Course::Assessment::Submission < ApplicationRecord
   # This guards against a race condition creating multiple current_answers for a given
   # question in load_or_create_answers.
   def current_answers
-    # Can't do filtering in AR because `answer` may not be persisted, and AR is dumb.
-    question_ids = questions.pluck(:id)
-    answers.select { |answer| answer.question_id.in? question_ids }.
-      select(&:current_answer?).group_by(&:question_id).map { |pair| pair[1].first }
+    if assessment.randomization.nil?
+      filtered_answers = answers
+    else
+      # Can't do filtering in AR because `answer` may not be persisted, and AR is dumb.
+      question_ids = questions.pluck(:id)
+      filtered_answers = answers.select { |answer| answer.question_id.in? question_ids }
+    end
+    filtered_answers.select(&:current_answer?).group_by(&:question_id).map { |pair| pair[1].first }
   end
 
   # @return [Array<Course::Assessment::Answer>] Current answers to programming questions
