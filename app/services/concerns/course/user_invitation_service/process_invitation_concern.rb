@@ -68,7 +68,7 @@ module Course::UserInvitationService::ProcessInvitationConcern
           @current_course.course_users.build(user: user[:user], name: user[:name],
                                              role: user[:role], phantom: user[:phantom],
                                              creator: @current_user, updater: @current_user)
-        @current_course.enrol_requests.find_by(user: user[:user].id)&.destroy!
+        @current_course.enrol_requests.pending.find_by(user: user[:user].id)&.destroy!
       end
     end
 
