@@ -4,7 +4,7 @@ class Course::EnrolRequestsController < Course::ComponentController
   load_and_authorize_resource :enrol_request, through: :course, class: Course::EnrolRequest.name
 
   def index
-    @enrol_requests = @enrol_requests.includes(:user)
+    @enrol_requests = @enrol_requests.includes(:user, :confirmer)
   end
 
   def create
@@ -40,6 +40,13 @@ class Course::EnrolRequestsController < Course::ComponentController
     end
   end
 
+  def reject
+    return unless @enrol_request.update!(reject: true)
+
+    Course::Mailer.user_rejected_email(current_course, @enrol_request.user).deliver_later
+    redirect_to course_enrol_requests_path(current_course), success: t('.success', user: @enrol_request.user.name)
+  end
+
   private
 
   def create_course_user
@@ -47,7 +54,7 @@ class Course::EnrolRequestsController < Course::ComponentController
       reverse_merge(course: current_course, user_id: @enrol_request.user_id))
 
     CourseUser.transaction do
-      raise ActiveRecord::Rollback unless @enrol_request.destroy && course_user.save
+      raise ActiveRecord::Rollback unless course_user.save && @enrol_request.update!(approve: true)
     end
 
     course_user
