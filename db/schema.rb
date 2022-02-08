@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_26_161011) do
+ActiveRecord::Schema.define(version: 2022_01_28_060844) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -420,10 +420,16 @@ ActiveRecord::Schema.define(version: 2021_12_26_161011) do
     t.string "session_id", limit: 255
     t.datetime "submitted_at"
     t.datetime "last_graded_time", default: "2021-10-24 14:11:56"
-    t.index ["assessment_id", "creator_id"], name: "unique_assessment_id_and_creator_id", unique: true
+    t.boolean "is_official_submission", default: true
+    t.integer "submission_type", default: 0, null: false
+    t.bigint "unsubmitter_id"
+    t.datetime "unsubmitted_at"
+    t.index ["assessment_id", "creator_id", "submission_type"], name: "unique_assessment_creator_and_submission_type_when_attempting", unique: true, where: "((workflow_state)::text = 'attempting'::text)"
+    t.index ["assessment_id", "creator_id"], name: "unique_official_submission_assessment_id_and_creator_id", unique: true, where: "(is_official_submission = true)"
     t.index ["assessment_id"], name: "fk__course_assessment_submissions_assessment_id"
     t.index ["creator_id"], name: "fk__course_assessment_submissions_creator_id"
     t.index ["publisher_id"], name: "fk__course_assessment_submissions_publisher_id"
+    t.index ["unsubmitter_id"], name: "index_course_assessment_submissions_on_unsubmitter_id"
     t.index ["updater_id"], name: "fk__course_assessment_submissions_updater_id"
   end
 
@@ -463,6 +469,9 @@ ActiveRecord::Schema.define(version: 2021_12_26_161011) do
     t.boolean "show_mcq_mrq_solution", default: true
     t.boolean "block_student_viewing_after_submitted", default: false
     t.integer "satisfiability_type", default: 0
+    t.boolean "allow_practice_attempts", default: false
+    t.boolean "allow_practice_exp", default: false
+    t.integer "practice_max_retries"
     t.index ["creator_id"], name: "fk__course_assessments_creator_id"
     t.index ["tab_id"], name: "fk__course_assessments_tab_id"
     t.index ["updater_id"], name: "fk__course_assessments_updater_id"
@@ -1327,6 +1336,7 @@ ActiveRecord::Schema.define(version: 2021_12_26_161011) do
   add_foreign_key "course_assessment_submissions", "course_assessments", column: "assessment_id", name: "fk_course_assessment_submissions_assessment_id"
   add_foreign_key "course_assessment_submissions", "users", column: "creator_id", name: "fk_course_assessment_submissions_creator_id"
   add_foreign_key "course_assessment_submissions", "users", column: "publisher_id", name: "fk_course_assessment_submissions_publisher_id"
+  add_foreign_key "course_assessment_submissions", "users", column: "unsubmitter_id"
   add_foreign_key "course_assessment_submissions", "users", column: "updater_id", name: "fk_course_assessment_submissions_updater_id"
   add_foreign_key "course_assessment_tabs", "course_assessment_categories", column: "category_id", name: "fk_course_assessment_tabs_category_id"
   add_foreign_key "course_assessment_tabs", "users", column: "creator_id", name: "fk_course_assessment_tabs_creator_id"

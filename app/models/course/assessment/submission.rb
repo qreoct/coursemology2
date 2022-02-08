@@ -10,6 +10,8 @@ class Course::Assessment::Submission < ApplicationRecord
 
   after_save :auto_grade_submission, if: :submitted?
 
+  enum submission_type: { new: 0, reattempt: 1, practice: 2 }, _prefix: true
+
   workflow do
     state :attempting do
       # TODO: Change the if condition to use a symbol when the Workflow gem is upgraded to 1.3.0.
@@ -33,6 +35,7 @@ class Course::Assessment::Submission < ApplicationRecord
       # submissions when assessment booleans are modified
       event :resubmit_programming, transitions_to: :submitted
     end
+    state :unsubmitted
   end
 
   Course::Assessment::Answer.after_save do |answer|
