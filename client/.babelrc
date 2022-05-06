@@ -7,12 +7,19 @@
         "runtime": "automatic"
       }
     ],
-    "@babel/preset-typescript",
+    "@babel/preset-typescript"
   ],
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-class-properties",
 
     ["react-intl", { "messagesDir": "./build/messages/" }]
-  ]
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        ["react-remove-properties", {"properties": ["data-testid"]}]
+      ]
+    }
+  }
 }
