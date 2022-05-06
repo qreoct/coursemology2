@@ -6,8 +6,13 @@ interface Props extends IconButtonProps {
 }
 
 const EditButton = ({ onClick, ...props }: Props): JSX.Element => (
-  <IconButton onClick={onClick} color="inherit" {...props}>
-    <Edit />
+  <IconButton
+    onClick={onClick}
+    color="inherit"
+    {...props}
+    data-testid="EditIconButton"
+  >
+    <Edit data-testid="EditIcon" />
   </IconButton>
 );
 

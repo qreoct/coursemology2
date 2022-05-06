@@ -29,10 +29,11 @@ const DeleteButton = ({
         }}
         color="error"
         {...props}
+        data-testid="DeleteIconButton"
       >
-        <Delete />
+        <Delete data-testid="DeleteIcon" />
       </IconButton>
-      {dialogOpen && (
+      {withDialog && dialogOpen && (
         <ConfirmationDialog
           message="Are you sure you wish to delete this achievement?"
           disableCancelButton={disabled}
