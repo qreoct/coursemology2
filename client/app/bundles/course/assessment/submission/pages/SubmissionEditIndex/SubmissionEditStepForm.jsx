@@ -144,7 +144,7 @@ const SubmissionEditStepForm = (props) => {
     const isBackendOutdated = !answerStatus[question.id].isLatestAnswer;
     const isFrontendDirty = question.answerId in dirtyFields;
     return isBackendOutdated || isFrontendDirty;
-  }
+  };
 
   const shouldDisableContinueButton = () => {
     const questionId = questionIds[stepIndex];
@@ -161,14 +161,14 @@ const SubmissionEditStepForm = (props) => {
   };
 
   const shouldDisableFinaliseButton = () => {
-    console.log(`isDirty ${isDirty} allcorrect ${allConsideredCorrect}`);
+    // console.log(`isDirty ${isDirty} allcorrect ${allConsideredCorrect}`);
     const df = Object.keys(dirtyFields).map((x) => ({
       field: x,
-      value: getValues(x)
+      value: getValues(x),
     }));
-    console.log("dirtyfields:", df);
+    // console.log("dirtyfields:", df);
     return isSaving || (!allowPartialSubmission && isDirty && df.length > 0);
-  }
+  };
 
   const shouldRenderContinueButton = () =>
     !isLastQuestion(questionIds, stepIndex);
@@ -526,8 +526,11 @@ const SubmissionEditStepForm = (props) => {
         {questionIds.map((questionId, index) => {
           let stepButtonColor = '';
           const isCurrentQuestion = index === stepIndex;
-          if (explanations[questionId] && explanations[questionId].correct
-              && !isOutdated(questions[questionId])) {
+          if (
+            explanations[questionId] &&
+            explanations[questionId].correct &&
+            !isOutdated(questions[questionId])
+          ) {
             stepButtonColor = isCurrentQuestion ? green[700] : green[300];
           } else {
             stepButtonColor = isCurrentQuestion ? blue[800] : lightBlue[400];

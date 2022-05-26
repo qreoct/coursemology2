@@ -83,7 +83,7 @@ export const answerShape = PropTypes.shape({
 
 export const answerStatusShape = PropTypes.shape({
   isLatestAnswer: PropTypes.bool,
-})
+});
 
 export const explanationShape = PropTypes.shape({
   correct: PropTypes.bool,

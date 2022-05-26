@@ -335,7 +335,6 @@ class VisibleSubmissionEditIndex extends Component {
         handlePublish={() => this.handlePublish()}
         handleToggleViewHistoryMode={this.handleToggleViewHistoryMode}
         explanations={explanations}
-        answerStatus={answers.status}
         grading={grading}
         showMcqMrqSolution={showMcqMrqSolution}
         graderView={graderView}

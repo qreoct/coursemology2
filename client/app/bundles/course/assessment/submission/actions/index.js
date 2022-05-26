@@ -64,16 +64,14 @@ function buildErrorMessage(error) {
  * and sets their initialValue to this value
  */
 const resetFields = (fields, id, resetField) => {
-  Object.keys(fields).forEach(
-    (fieldName) => {
-      console.log(`reset ${id}.${fieldName} to `, fields[fieldName]);
-      resetField(`${id}.${fieldName}`, {
-        defaultValue: fields[fieldName],
-      })
-    }
-  );
-  console.log("reset fields successfully complete :)");
-}
+  Object.keys(fields).forEach((fieldName) => {
+    // console.log(`reset ${id}.${fieldName} to `, fields[fieldName]);
+    resetField(`${id}.${fieldName}`, {
+      defaultValue: fields[fieldName],
+    });
+  });
+  // console.log("reset fields successfully complete :)");
+};
 
 function getEvaluationResult(submissionId, answerId, questionId, resetField) {
   return (dispatch) => {
@@ -254,7 +252,12 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
             JOB_POLL_DELAY,
             () =>
               dispatch(
-                getEvaluationResult(submissionId, answer.id, questionId, resetField),
+                getEvaluationResult(
+                  submissionId,
+                  answer.id,
+                  questionId,
+                  resetField,
+                ),
               ),
             (errorData) => {
               dispatch({
@@ -264,7 +267,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
               });
               dispatch(setNotification(translations.requestFailure));
             },
-          )
+          );
         } else {
           dispatch({
             type: actionTypes.AUTOGRADE_SUCCESS,
@@ -273,7 +276,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
           });
           // When an answer is submitted, the value of that field needs to be updated.
           // setValue(`${answerId}`, data.fields);
-          
+
           // When an answer is submitted, update default value of field for form
           // Need to individually reset fields https://github.com/react-hook-form/react-hook-form/issues/7841
           resetFields(data.fields, answerId, resetField);

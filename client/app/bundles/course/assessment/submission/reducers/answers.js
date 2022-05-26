@@ -45,7 +45,7 @@ export default function (state = initialState, action) {
         initial: initialValues,
         status: {
           ...state.status,
-          ...answerStatus
+          ...answerStatus,
         },
       };
     }
@@ -58,7 +58,7 @@ export default function (state = initialState, action) {
         ...state,
         status: {
           ...state.status,
-          ...answerStatus
+          ...answerStatus,
         },
       };
     }
