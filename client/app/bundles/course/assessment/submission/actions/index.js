@@ -59,7 +59,23 @@ function buildErrorMessage(error) {
     .join(', ');
 }
 
-function getEvaluationResult(submissionId, answerId, questionId) {
+/**
+ * Resets the following fields in react-hook-form
+ * and sets their initialValue to this value
+ */
+const resetFields = (fields, id, resetField) => {
+  Object.keys(fields).forEach(
+    (fieldName) => {
+      console.log(`reset ${id}.${fieldName} to `, fields[fieldName]);
+      resetField(`${id}.${fieldName}`, {
+        defaultValue: fields[fieldName],
+      })
+    }
+  );
+  console.log("reset fields successfully complete :)");
+}
+
+function getEvaluationResult(submissionId, answerId, questionId, resetField) {
   return (dispatch) => {
     CourseAPI.assessment.submissions
       .reloadAnswer(submissionId, { answer_id: answerId })
@@ -70,6 +86,9 @@ function getEvaluationResult(submissionId, answerId, questionId) {
           payload: data,
           questionId,
         });
+        if (resetField !== undefined) {
+          resetFields(data.fields, answerId, resetField);
+        }
       })
       .catch(() => {
         dispatch(setNotification(translations.requestFailure));
@@ -215,7 +234,7 @@ export function unsubmit(submissionId) {
   };
 }
 
-export function submitAnswer(submissionId, answerId, rawAnswer, setValue) {
+export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
   const answer = formatAnswer(rawAnswer);
   const payload = { answer };
   const questionId = answer.questionId;
@@ -235,7 +254,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, setValue) {
             JOB_POLL_DELAY,
             () =>
               dispatch(
-                getEvaluationResult(submissionId, answer.id, questionId),
+                getEvaluationResult(submissionId, answer.id, questionId, resetField),
               ),
             (errorData) => {
               dispatch({
@@ -245,16 +264,19 @@ export function submitAnswer(submissionId, answerId, rawAnswer, setValue) {
               });
               dispatch(setNotification(translations.requestFailure));
             },
-          );
+          )
         } else {
           dispatch({
             type: actionTypes.AUTOGRADE_SUCCESS,
             payload: data,
             questionId,
           });
-
           // When an answer is submitted, the value of that field needs to be updated.
-          setValue(`${answerId}`, data.fields);
+          // setValue(`${answerId}`, data.fields);
+          
+          // When an answer is submitted, update default value of field for form
+          // Need to individually reset fields https://github.com/react-hook-form/react-hook-form/issues/7841
+          resetFields(data.fields, answerId, resetField);
         }
       })
       .catch(() => {
@@ -278,9 +300,8 @@ export function resetAnswer(submissionId, answerId, questionId, setValue) {
           payload: data,
           questionId,
         });
-
-        // When an answer is submitted, the value of that field needs to be updated.
         setValue(`${answerId}`, data.fields);
+        // resetFields(data.fields, answerId, resetField);
       })
       .catch(() => dispatch({ type: actionTypes.RESET_FAILURE, questionId }));
   };

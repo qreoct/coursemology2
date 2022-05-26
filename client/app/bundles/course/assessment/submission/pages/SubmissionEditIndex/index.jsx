@@ -177,24 +177,28 @@ class VisibleSubmissionEditIndex extends Component {
     dispatch(finalise(params.submissionId, data));
   };
 
-  onSubmitAnswer = (answerId, answer, setValue) => {
+  onSubmitAnswer = (answerId, answer, resetField) => {
     const {
       dispatch,
       match: { params },
     } = this.props;
-    dispatch(submitAnswer(params.submissionId, answerId, answer, setValue));
+    dispatch(submitAnswer(params.submissionId, answerId, answer, resetField));
   };
 
   allConsideredCorrect() {
-    const { explanations, questions } = this.props;
+    const { answers, explanations, questions } = this.props;
     if (Object.keys(explanations).length !== Object.keys(questions).length) {
       return false;
     }
 
+    const allUpdated = Object.keys(answers.status).every(
+      (qid) => answers.status[qid] && answers.status[qid].isLatestAnswer,
+    );
+
     const numIncorrect = Object.keys(explanations).filter(
       (qid) => !explanations[qid] || !explanations[qid].correct,
     ).length;
-    return numIncorrect === 0;
+    return numIncorrect === 0 && allUpdated;
   }
 
   renderAssessment() {
@@ -294,6 +298,7 @@ class VisibleSubmissionEditIndex extends Component {
           handleAutogradeSubmission={() => this.handleAutogradeSubmission()}
           handleToggleViewHistoryMode={this.handleToggleViewHistoryMode}
           explanations={explanations}
+          answerStatus={answers.status}
           allConsideredCorrect={this.allConsideredCorrect()}
           allowPartialSubmission={allowPartialSubmission}
           showMcqAnswer={showMcqAnswer}
@@ -330,6 +335,7 @@ class VisibleSubmissionEditIndex extends Component {
         handlePublish={() => this.handlePublish()}
         handleToggleViewHistoryMode={this.handleToggleViewHistoryMode}
         explanations={explanations}
+        answerStatus={answers.status}
         grading={grading}
         showMcqMrqSolution={showMcqMrqSolution}
         graderView={graderView}

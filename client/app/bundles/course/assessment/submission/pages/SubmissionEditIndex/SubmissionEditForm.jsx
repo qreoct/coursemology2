@@ -25,6 +25,7 @@ import { blue, yellow, red } from '@mui/material/colors';
 import ConfirmationDialog from 'lib/components/ConfirmationDialog';
 import ErrorText from 'lib/components/ErrorText';
 import {
+  answerStatusShape,
   explanationShape,
   questionShape,
   historyQuestionShape,
@@ -70,6 +71,7 @@ const styles = {
 
 const SubmissionEditForm = (props) => {
   const {
+    answerStatus,
     attempting,
     canUpdate,
     explanations,
@@ -126,6 +128,7 @@ const SubmissionEditForm = (props) => {
     getValues,
     handleSubmit,
     reset,
+    resetField,
     setValue,
     formState: { errors, isDirty },
   } = methods;
@@ -315,7 +318,7 @@ const SubmissionEditForm = (props) => {
                 }
                 id="run-code"
                 onClick={() =>
-                  onSubmitAnswer(answerId, getValues(`${answerId}`), setValue)
+                  onSubmitAnswer(answerId, getValues(`${answerId}`), resetField)
                 }
                 style={styles.formButton}
               >
@@ -680,6 +683,7 @@ SubmissionEditForm.propTypes = {
   graded: PropTypes.bool.isRequired,
   published: PropTypes.bool.isRequired,
 
+  answerStatus: PropTypes.objectOf(answerStatusShape),
   explanations: PropTypes.objectOf(explanationShape),
   grading: PropTypes.objectOf(questionGradeShape),
   questionIds: PropTypes.arrayOf(PropTypes.number),
