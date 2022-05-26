@@ -1,18 +1,22 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
-import MaterialSummernote from 'lib/components/MaterialSummernote';
+import DraftRichText from '../../DraftRichText';
+import MaterialSummernote from '../../MaterialSummernote';
 import propsAreEqual from './utils/propsAreEqual';
 
 const FormRichTextField = (props) => {
   const { field, fieldState, disabled, label, ...custom } = props;
 
   return (
-    <MaterialSummernote
-      {...field}
-      disabled={disabled}
-      label={label}
-      {...custom}
-    />
+    <>
+      {/* <MaterialSummernote
+        {...field}
+        disabled={disabled}
+        label={label}
+        {...custom}
+      /> */}
+      <DraftRichText {...field} disabled={disabled} label={label} {...custom} />
+    </>
   );
 };
 

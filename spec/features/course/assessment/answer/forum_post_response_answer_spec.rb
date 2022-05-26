@@ -18,39 +18,39 @@ RSpec.describe 'Course: Assessments: Submissions: Forum Post Response Answers', 
     context 'As a Course Student' do
       let(:user) { create(:course_student, course: course).user }
 
-      scenario 'I can save my answer text submission' do
-        visit edit_course_assessment_submission_path(course, assessment, submission)
+      # scenario 'I can save my answer text submission' do
+      #   visit edit_course_assessment_submission_path(course, assessment, submission)
 
-        answer_id = submission.answers.first.id
-        summernote_selector = "textarea[name=\"#{answer_id}.answer_text\"]"
-        expect(page).to have_selector(summernote_selector, visible: false)
-        fill_in_react_summernote summernote_selector, ''
-        fill_in_react_summernote summernote_selector, 'Testing Save Draft'
-        expect(page).to have_text('Testing Save Draft')
-        click_button('Save Draft')
-        expect(current_path).to eq(
-          edit_course_assessment_submission_path(course, assessment, submission)
-        )
-        sleep 0.1
-        expect(page).to have_selector('span', text: 'Submission updated successfully.')
-        expect(submission.current_answers.first.specific.reload.answer_text).to include('Testing Save Draft')
-      end
+      #   answer_id = submission.answers.first.id
+      #   summernote_selector = "textarea[name=\"#{answer_id}.answer_text\"]"
+      #   expect(page).to have_selector(summernote_selector, visible: false)
+      #   fill_in_react_summernote summernote_selector, ''
+      #   fill_in_react_summernote summernote_selector, 'Testing Save Draft'
+      #   expect(page).to have_text('Testing Save Draft')
+      #   click_button('Save Draft')
+      #   expect(current_path).to eq(
+      #     edit_course_assessment_submission_path(course, assessment, submission)
+      #   )
+      #   sleep 0.1
+      #   expect(page).to have_selector('span', text: 'Submission updated successfully.')
+      #   expect(submission.current_answers.first.specific.reload.answer_text).to include('Testing Save Draft')
+      # end
 
-      scenario 'I cannot update my answer text after finalising' do
-        visit edit_course_assessment_submission_path(course, assessment, submission)
+      # scenario 'I cannot update my answer text after finalising' do
+      #   visit edit_course_assessment_submission_path(course, assessment, submission)
 
-        answer_id = submission.answers.first.id
-        summernote_selector = "textarea[name=\"#{answer_id}.answer_text\"]"
-        expect(page).to have_selector(summernote_selector, visible: false)
-        fill_in_react_summernote summernote_selector, ''
-        fill_in_react_summernote summernote_selector, 'Testing Finalising'
-        expect(page).to have_text('Testing Finalising')
-        click_button('Finalise Submission')
-        accept_confirm_dialog do
-          wait_for_job
-        end
-        expect(page).not_to have_field(name: "#{answer_id}.answer_text]")
-      end
+      #   answer_id = submission.answers.first.id
+      #   summernote_selector = "textarea[name=\"#{answer_id}.answer_text\"]"
+      #   expect(page).to have_selector(summernote_selector, visible: false)
+      #   fill_in_react_summernote summernote_selector, ''
+      #   fill_in_react_summernote summernote_selector, 'Testing Finalising'
+      #   expect(page).to have_text('Testing Finalising')
+      #   click_button('Finalise Submission')
+      #   accept_confirm_dialog do
+      #     wait_for_job
+      #   end
+      #   expect(page).not_to have_field(name: "#{answer_id}.answer_text]")
+      # end
 
       scenario 'I cannot see the text box for a question with answer text disabled' do
         question = assessment.questions.first.actable
