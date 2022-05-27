@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import moment, { formatLongDateTime } from 'lib/moment';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router-dom';
 import mirrorCreator from 'mirror-creator';
 import {
   Card,
@@ -28,9 +27,6 @@ import LoadingIndicator from 'lib/components/LoadingIndicator';
 import UnsubmitButton from 'course/survey/containers/UnsubmitButton';
 import { surveyShape, responseShape } from 'course/survey/propTypes';
 import { useTheme } from '@mui/material/styles';
-import RemindButton from './RemindButton';
-import { workflowStates } from '../../../assessment/submission/constants';
-import { translations } from './translations';
 import ReactTooltip from 'react-tooltip';
 import ConfirmationDialog from 'lib/components/ConfirmationDialog';
 import RemindButton from './RemindButton';
@@ -67,10 +63,17 @@ const responseStatus = mirrorCreator([
 const ResponseIndex = (props) => {
   const { dispatch, survey, responses, isLoading } = props;
   const { palette } = useTheme();
+  const { NOT_STARTED, RESPONDING, SUBMITTED } = responseStatus;
   const dataColor = {
-    [NOT_STARTED]: palette && palette.submissionStatus[workflowStates.Unstarted],
-    [RESPONDING]: palette && palette.submissionStatus[workflowStates.Attempting],
-    [SUBMITTED]: palette && palette.submissionStatus[workflowStates.Published],
+    [NOT_STARTED]:
+      palette.submissionStatus &&
+      palette.submissionStatus[workflowStates.Unstarted],
+    [RESPONDING]:
+      palette.submissionStatus &&
+      palette.submissionStatus[workflowStates.Attempting],
+    [SUBMITTED]:
+      palette.submissionStatus &&
+      palette.submissionStatus[workflowStates.Published],
   };
   const [state, setState] = useState({
     includePhantomsInStats: false,
@@ -116,24 +119,22 @@ const ResponseIndex = (props) => {
     return updatedAt;
   };
 
-  const renderResponseStatus = (response, survey) => (
+  const renderResponseStatus = (response) => (
     <FormattedMessage {...translations[response.status]}>
       {(msg) => (
         <Chip
-          clickable={
-            response.status !== responseStatus.NOT_STARTED && !survey.anonymous
+          label={
+            response.status !== responseStatus.NOT_STARTED &&
+            !survey.anonymous ? (
+              <a href={response.path}>{msg}</a>
+            ) : (
+              msg
+            )
           }
-          label={msg}
-          component={
-            response.status !== responseStatus.NOT_STARTED && !survey.anonymous
-              ? Link
-              : null
-          }
-          to={response.path}
           style={{
             ...styles.chip,
             backgroundColor: survey.anonymous
-              ? palette.status.Submitted // grey colour
+              ? palette.submissionStatus.Submitted // grey colour
               : dataColor[response.status],
           }}
           variant="filled"
@@ -153,8 +154,7 @@ const ResponseIndex = (props) => {
     return submittedAt;
   };
 
-  const handleUnsubmitResponse = () => {
-    const { dispatch, buttonId } = props;
+  const handleUnsubmitResponse = (buttonId) => {
     const { unsubmitSuccess, unsubmitFailure } = translations;
     const successMessage = <FormattedMessage {...unsubmitSuccess} />;
     const failureMessage = <FormattedMessage {...unsubmitFailure} />;
@@ -199,7 +199,7 @@ const ResponseIndex = (props) => {
                 <>
                   <UnsubmitButton
                     buttonId={response.id}
-                    color={palette.icon.unsubmit}
+                    color={palette.submissionIcon.unsubmit}
                     setState={setState}
                     state={state}
                   />
@@ -212,7 +212,7 @@ const ResponseIndex = (props) => {
                     onCancel={() =>
                       setState({ ...state, unsubmitConfirmation: false })
                     }
-                    onConfirm={handleUnsubmitResponse}
+                    onConfirm={() => handleUnsubmitResponse(response.id)}
                   />
                 </>
               ) : null}
@@ -239,18 +239,6 @@ const ResponseIndex = (props) => {
   };
 
   const renderStats = (realResponsesStatuses, phantomResponsesStatuses) => {
-    const { NOT_STARTED, RESPONDING, SUBMITTED } = responseStatus;
-    const dataColor = {
-      [NOT_STARTED]:
-        palette.submissionStatus &&
-        palette.submissionStatus[workflowStates.Unstarted],
-      [RESPONDING]:
-        palette.submissionStatus &&
-        palette.submissionStatus[workflowStates.Attempting],
-      [SUBMITTED]:
-        palette.submissionStatus &&
-        palette.submissionStatus[workflowStates.Published],
-    };
     const chartData = [NOT_STARTED, RESPONDING, SUBMITTED].map((data) => {
       const count = state.includePhantomsInStats
         ? realResponsesStatuses[data] + phantomResponsesStatuses[data]
@@ -368,7 +356,6 @@ ResponseIndex.propTypes = {
   dispatch: PropTypes.func.isRequired,
   responses: PropTypes.arrayOf(responseShape),
   isLoading: PropTypes.bool.isRequired,
-  buttonId: PropTypes.number.isRequired,
 };
 
 export default connect((rootState) => rootState.responses)(ResponseIndex);
