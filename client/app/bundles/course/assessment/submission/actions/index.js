@@ -66,7 +66,7 @@ function buildErrorMessage(error) {
 const resetFields = (fields, id, resetField) => {
   Object.keys(fields).forEach((fieldName) => {
     if (fieldName === 'files_attributes') {
-      resetArrayField(fields[fieldName], `${id}.${fieldName}`, resetField);
+      resetArrayField(fields[fieldName], resetField, `${id}.${fieldName}`);
     } else {
       console.log(`resetting ${id}.${fieldName} to ${fields[fieldName]}`);
       resetField(`${id}.${fieldName}`, {
@@ -77,11 +77,12 @@ const resetFields = (fields, id, resetField) => {
 };
 
 // workaround for react-hook-array not being able to reset an arrayfield when array is passed in
-const resetArrayField = (array, path, fn) => {
-  const fieldPath = path == "" ? "" : `${path}.`;
-  console.log(`(resetarrayfield) resetting ${array}`);
+const resetArrayField = (array, fn, path = "") => {
+  const fieldPath = path === "" ? "" : `${path}.`;
+  console.log("(resetarrayfield START) resetting", array);
   array.forEach((obj, index) => {
     Object.keys(obj).forEach((fieldName) => {
+      // if (fieldName === 'staged') return;
       console.log(`(resetarrayfield) resetting ${fieldPath}${index}.${fieldName} to ${obj[fieldName]}`);
       fn(`${fieldPath}${index}.${fieldName}`, {
         defaultValue: obj[fieldName],
@@ -308,7 +309,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
   };
 }
 
-export function resetAnswer(submissionId, answerId, questionId, setValue) {
+export function resetAnswer(submissionId, answerId, questionId, setValue, resetField) {
   const payload = { answer_id: answerId, reset_answer: true };
   return (dispatch) => {
     dispatch({ type: actionTypes.RESET_REQUEST, questionId });
@@ -330,7 +331,7 @@ export function resetAnswer(submissionId, answerId, questionId, setValue) {
   };
 }
 
-export function deleteFile(answerId, fileId, answers, resetField) {
+export function deleteFile(answerId, fileId, answers, setValue, resetField) {
   const answer = Object.values(answers).find((ans) => ans.id === answerId);
   const payload = { answer: { id: answerId, file_id: fileId } };
 
@@ -354,9 +355,10 @@ export function deleteFile(answerId, fileId, answers, resetField) {
         const newFilesAttributes = answer.files_attributes.filter(
           (file) => file.id !== fileId,
         );
-        // setValue(`${answerId}.files_attributes`, newFilesAttributes);
-        console.log("calling resetarrayfield");
-        resetArrayField(newFilesAttributes, "", resetField);
+        setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
+        console.log("calling resetarrayfield from DELETE_FILE");
+        // resetField(`${answerId}.files_attributes`, newFilesAttributes);
+        // resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
 
         dispatch(setNotification(translations.deleteFileSuccess));
       })
@@ -388,7 +390,7 @@ function validateJavaFiles(files) {
 }
 
 // Imports staged files into the question to be evaluated
-export function importFiles(answerId, answerFields, language, resetField) {
+export function importFiles(answerId, answerFields, language, setValue, resetField) {
   const answer = Object.values(answerFields).find((ans) => ans.id === answerId);
   const files = answerFields[answerId].files_attributes;
   const payload = { answer: { id: answerId, ...answer } };
@@ -418,12 +420,16 @@ export function importFiles(answerId, answerFields, language, resetField) {
             (file) => ({ ...file, staged: false }),
           );
           // resetFields(newFilesAttributes, answerId, resetField);
-          resetArrayField(newFilesAttributes, "", resetField);
 
 
-          // setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
+          console.log(`originally, i was setting ${answerId}.files_attributes to `, newFilesAttributes);
+          setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
+          resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
           // import_files field is reset to remove files from dropbox.
-          setValue(`${answerId}.import_files`, []);
+          setValue(`${answerId}.import_files`, []); // original
+          resetField(`${answerId}.import_files`, {
+            defaultValue: [],
+          });
 
           dispatch(setNotification(translations.importFilesSuccess));
         })

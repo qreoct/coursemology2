@@ -167,6 +167,8 @@ const SubmissionEditStepForm = (props) => {
       value: getValues(x),
     }));
     console.log("dirtyfields:", df);
+
+    console.log("current form values:", getValues());
     return isSaving || (!allowPartialSubmission && isDirty && df.length > 0);
   };
 
@@ -342,7 +344,7 @@ const SubmissionEditStepForm = (props) => {
       onConfirm={() => {
         setResetConfirmation(false);
         setResetAnswerId(null);
-        onReset(resetAnswerId, setValue);
+        onReset(resetAnswerId, setValue, resetField);
       }}
       message={intl.formatMessage(translations.resetConfirmation)}
     />

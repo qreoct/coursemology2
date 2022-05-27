@@ -151,14 +151,14 @@ class VisibleSubmissionEditIndex extends Component {
     dispatch(unsubmit(params.submissionId));
   }
 
-  onReset = (answerId, setValue) => {
+  onReset = (answerId, setValue, resetField) => {
     const {
       answers,
       dispatch,
       match: { params },
     } = this.props;
     const questionId = answers.initial[answerId].questionId;
-    dispatch(resetAnswer(params.submissionId, answerId, questionId, setValue));
+    dispatch(resetAnswer(params.submissionId, answerId, questionId, setValue, resetField));
   };
 
   onSaveDraft = (data) => {

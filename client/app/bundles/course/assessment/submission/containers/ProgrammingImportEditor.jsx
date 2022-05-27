@@ -102,7 +102,7 @@ const renderProgrammingHistoryEditor = (answer, displayFileIndex) => {
 };
 
 const stageFiles = async (props) => {
-  const { answerId, answers, filesToImport, setValue } = props;
+  const { answerId, answers, filesToImport, setValue, resetField } = props;
 
   // Create a map of promises that will resolve all files are read
   const readerPromises = Object.keys(filesToImport).map(
@@ -134,7 +134,14 @@ const stageFiles = async (props) => {
       (file) => !file.staged,
     );
 
-    setValue(`${answerId}.files_attributes`, filteredFiles.concat(newFiles));
+    setValue(`${answerId}.files_attributes`, filteredFiles.concat(newFiles), {
+      shouldDirty: false,
+    }); // original
+    // console.log("here");
+    // resetArrayField(filteredFiles.concat(newFiles), resetField, `${answerId}.files_attribtues`);
+    // resetField(`${answerId}.files_attributes`, {
+      // defaultValue: filteredFiles.concat(newFiles),
+    // })
   });
 };
 
@@ -169,7 +176,7 @@ const VisibleProgrammingImportEditor = (props) => {
   const disableImport = !stagedFiles || isSaving;
 
   const handleDeleteFile = (fileId) => {
-    dispatch(deleteFile(answerId, fileId, answers, resetField));
+    dispatch(deleteFile(answerId, fileId, answers, setValue, resetField));
     setDisplayFileIndex(0);
   };
 
@@ -211,6 +218,7 @@ const VisibleProgrammingImportEditor = (props) => {
                 answers,
                 filesToImport,
                 setValue,
+                resetField,
               })
             }
           />
@@ -219,7 +227,7 @@ const VisibleProgrammingImportEditor = (props) => {
             disabled={disableImport}
             onClick={() =>
               dispatch(
-                importFiles(answerId, answers, question.language, resetField),
+                importFiles(answerId, answers, question.language, setValue, resetField),
               )
             }
             style={styles.formButton}
