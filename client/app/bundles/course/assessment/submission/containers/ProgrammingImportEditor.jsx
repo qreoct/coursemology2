@@ -137,13 +137,27 @@ const stageFiles = async (props) => {
     setValue(`${answerId}.files_attributes`, filteredFiles.concat(newFiles), {
       shouldDirty: false,
     }); // original
-    // console.log("here");
-    // resetArrayField(filteredFiles.concat(newFiles), resetField, `${answerId}.files_attribtues`);
+    console.log("here");
+    resetArrayField(filteredFiles.concat(newFiles), resetField, `${answerId}.files_attributes`);
     // resetField(`${answerId}.files_attributes`, {
       // defaultValue: filteredFiles.concat(newFiles),
     // })
   });
 };
+
+const resetArrayField = (array, fn, path = "") => {
+  const fieldPath = path === "" ? "" : `${path}.`;
+  console.log("(file import editor resetarrayfield START) resetting", array);
+  array.forEach((obj, index) => {
+    Object.keys(obj).forEach((fieldName) => {
+      // if (fieldName === 'staged') return;
+      // console.log(`(resetarrayfield) resetting ${fieldPath}${index}.${fieldName} to ${obj[fieldName]}`);
+      fn(`${fieldPath}${index}.${fieldName}`, {
+        defaultValue: obj[fieldName],
+      });
+    });
+  });
+}
 
 const VisibleProgrammingImportEditor = (props) => {
   const [displayFileIndex, setDisplayFileIndex] = useState(0);

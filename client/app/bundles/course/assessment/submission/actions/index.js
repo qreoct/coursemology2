@@ -91,7 +91,7 @@ const resetArrayField = (array, fn, path = "") => {
   });
 }
 
-function getEvaluationResult(submissionId, answerId, questionId, resetField) {
+function getEvaluationResult(submissionId, answerId, questionId, setValue, resetField) {
   return (dispatch) => {
     CourseAPI.assessment.submissions
       .reloadAnswer(submissionId, { answer_id: answerId })
@@ -102,7 +102,9 @@ function getEvaluationResult(submissionId, answerId, questionId, resetField) {
           payload: data,
           questionId,
         });
-        if (resetField !== undefined) {
+        if (setValue !== undefined && resetField !== undefined) {
+          console.log(`SET ${answerId}.files_attributes TO`, data.fields.files_attributes);
+          setValue(`${answerId}.files_attributes`, data.fields.files_attributes);
           resetFields(data.fields, answerId, resetField);
         }
       })
@@ -250,7 +252,7 @@ export function unsubmit(submissionId) {
   };
 }
 
-export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
+export function submitAnswer(submissionId, answerId, rawAnswer, setValue, resetField) {
   const answer = formatAnswer(rawAnswer);
   const payload = { answer };
   const questionId = answer.questionId;
@@ -276,6 +278,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
                   submissionId,
                   answer.id,
                   questionId,
+                  setValue,
                   resetField,
                 ),
               ),
@@ -355,10 +358,13 @@ export function deleteFile(answerId, fileId, answers, setValue, resetField) {
         const newFilesAttributes = answer.files_attributes.filter(
           (file) => file.id !== fileId,
         );
-        setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
+        setValue(`${answerId}.files_attributes`, newFilesAttributes, {
+          shouldDirty: false,
+        }); // original
         console.log("calling resetarrayfield from DELETE_FILE");
+
         // resetField(`${answerId}.files_attributes`, newFilesAttributes);
-        // resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
+        resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
 
         dispatch(setNotification(translations.deleteFileSuccess));
       })

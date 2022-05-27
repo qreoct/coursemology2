@@ -177,12 +177,12 @@ class VisibleSubmissionEditIndex extends Component {
     dispatch(finalise(params.submissionId, data));
   };
 
-  onSubmitAnswer = (answerId, answer, resetField) => {
+  onSubmitAnswer = (answerId, answer, setValue, resetField) => {
     const {
       dispatch,
       match: { params },
     } = this.props;
-    dispatch(submitAnswer(params.submissionId, answerId, answer, resetField));
+    dispatch(submitAnswer(params.submissionId, answerId, answer, setValue, resetField));
   };
 
   allConsideredCorrect() {
