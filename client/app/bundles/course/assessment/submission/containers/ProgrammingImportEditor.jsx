@@ -140,7 +140,7 @@ const stageFiles = async (props) => {
 
 const VisibleProgrammingImportEditor = (props) => {
   const [displayFileIndex, setDisplayFileIndex] = useState(0);
-  const { control, setValue } = useFormContext();
+  const { control, setValue, resetField } = useFormContext();
   const {
     dispatch,
     submissionId,
@@ -169,7 +169,7 @@ const VisibleProgrammingImportEditor = (props) => {
   const disableImport = !stagedFiles || isSaving;
 
   const handleDeleteFile = (fileId) => {
-    dispatch(deleteFile(answerId, fileId, answers, setValue));
+    dispatch(deleteFile(answerId, fileId, answers, resetField));
     setDisplayFileIndex(0);
   };
 
@@ -219,7 +219,7 @@ const VisibleProgrammingImportEditor = (props) => {
             disabled={disableImport}
             onClick={() =>
               dispatch(
-                importFiles(answerId, answers, question.language, setValue),
+                importFiles(answerId, answers, question.language, resetField),
               )
             }
             style={styles.formButton}

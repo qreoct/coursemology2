@@ -161,12 +161,12 @@ const SubmissionEditStepForm = (props) => {
   };
 
   const shouldDisableFinaliseButton = () => {
-    // console.log(`isDirty ${isDirty} allcorrect ${allConsideredCorrect}`);
+    console.log(`isDirty ${isDirty} allcorrect ${allConsideredCorrect}`);
     const df = Object.keys(dirtyFields).map((x) => ({
       field: x,
       value: getValues(x),
     }));
-    // console.log("dirtyfields:", df);
+    console.log("dirtyfields:", df);
     return isSaving || (!allowPartialSubmission && isDirty && df.length > 0);
   };
 

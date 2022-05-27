@@ -65,13 +65,30 @@ function buildErrorMessage(error) {
  */
 const resetFields = (fields, id, resetField) => {
   Object.keys(fields).forEach((fieldName) => {
-    // console.log(`reset ${id}.${fieldName} to `, fields[fieldName]);
-    resetField(`${id}.${fieldName}`, {
-      defaultValue: fields[fieldName],
+    if (fieldName === 'files_attributes') {
+      resetArrayField(fields[fieldName], `${id}.${fieldName}`, resetField);
+    } else {
+      console.log(`resetting ${id}.${fieldName} to ${fields[fieldName]}`);
+      resetField(`${id}.${fieldName}`, {
+        defaultValue: fields[fieldName],
+      });
+    }
+  });
+};
+
+// workaround for react-hook-array not being able to reset an arrayfield when array is passed in
+const resetArrayField = (array, path, fn) => {
+  const fieldPath = path == "" ? "" : `${path}.`;
+  console.log(`(resetarrayfield) resetting ${array}`);
+  array.forEach((obj, index) => {
+    Object.keys(obj).forEach((fieldName) => {
+      console.log(`(resetarrayfield) resetting ${fieldPath}${index}.${fieldName} to ${obj[fieldName]}`);
+      fn(`${fieldPath}${index}.${fieldName}`, {
+        defaultValue: obj[fieldName],
+      });
     });
   });
-  // console.log("reset fields successfully complete :)");
-};
+}
 
 function getEvaluationResult(submissionId, answerId, questionId, resetField) {
   return (dispatch) => {
@@ -237,6 +254,8 @@ export function submitAnswer(submissionId, answerId, rawAnswer, resetField) {
   const payload = { answer };
   const questionId = answer.questionId;
 
+  console.log("(submitAnswer)", answer);
+
   return (dispatch) => {
     dispatch({ type: actionTypes.AUTOGRADE_REQUEST, questionId });
 
@@ -303,6 +322,7 @@ export function resetAnswer(submissionId, answerId, questionId, setValue) {
           payload: data,
           questionId,
         });
+        console.log("(resetting prog question) resetAnswer fields are ", data.fields);
         setValue(`${answerId}`, data.fields);
         // resetFields(data.fields, answerId, resetField);
       })
@@ -310,7 +330,7 @@ export function resetAnswer(submissionId, answerId, questionId, setValue) {
   };
 }
 
-export function deleteFile(answerId, fileId, answers, setValue) {
+export function deleteFile(answerId, fileId, answers, resetField) {
   const answer = Object.values(answers).find((ans) => ans.id === answerId);
   const payload = { answer: { id: answerId, file_id: fileId } };
 
@@ -322,6 +342,8 @@ export function deleteFile(answerId, fileId, answers, setValue) {
       .then((response) => response.data)
       .then((data) => {
         const responsePayload = { questionId: answer.questionId, answer: data };
+        console.log("comparing responsepayload", [responsePayload]);
+        console.log("with data", [data]);
         dispatch({
           type: actionTypes.DELETE_FILE_SUCCESS,
           payload: responsePayload,
@@ -332,7 +354,9 @@ export function deleteFile(answerId, fileId, answers, setValue) {
         const newFilesAttributes = answer.files_attributes.filter(
           (file) => file.id !== fileId,
         );
-        setValue(`${answerId}.files_attributes`, newFilesAttributes);
+        // setValue(`${answerId}.files_attributes`, newFilesAttributes);
+        console.log("calling resetarrayfield");
+        resetArrayField(newFilesAttributes, "", resetField);
 
         dispatch(setNotification(translations.deleteFileSuccess));
       })
@@ -364,7 +388,7 @@ function validateJavaFiles(files) {
 }
 
 // Imports staged files into the question to be evaluated
-export function importFiles(answerId, answerFields, language, setValue) {
+export function importFiles(answerId, answerFields, language, resetField) {
   const answer = Object.values(answerFields).find((ans) => ans.id === answerId);
   const files = answerFields[answerId].files_attributes;
   const payload = { answer: { id: answerId, ...answer } };
@@ -393,7 +417,11 @@ export function importFiles(answerId, answerFields, language, setValue) {
           const newFilesAttributes = data.fields.files_attributes.map(
             (file) => ({ ...file, staged: false }),
           );
-          setValue(`${answerId}.files_attributes`, newFilesAttributes);
+          // resetFields(newFilesAttributes, answerId, resetField);
+          resetArrayField(newFilesAttributes, "", resetField);
+
+
+          // setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
           // import_files field is reset to remove files from dropbox.
           setValue(`${answerId}.import_files`, []);
 

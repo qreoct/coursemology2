@@ -50,9 +50,13 @@ export default function (state = initialState, action) {
       };
     }
     case actions.IMPORT_FILES_SUCCESS:
-    case actions.AUTOGRADE_SUCCESS:
-    case actions.RESET_SUCCESS:
     case actions.DELETE_FILE_SUCCESS: {
+      return {
+        ...state,
+      };
+    }
+    case actions.AUTOGRADE_SUCCESS:
+    case actions.RESET_SUCCESS: {
       const answerStatus = buildAnswerStatus([action.payload]);
       return {
         ...state,
