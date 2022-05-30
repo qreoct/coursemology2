@@ -160,10 +160,9 @@ const SubmissionEditStepForm = (props) => {
     return showMcqAnswer;
   };
 
-  const shouldDisableFinaliseButton = () => {
-    return isSaving ||
-      (!allowPartialSubmission && isDirty && Object.keys(dirtyFields).length > 0);
-  };
+  const shouldDisableFinaliseButton = () =>
+    isSaving ||
+    (!allowPartialSubmission && isDirty && Object.keys(dirtyFields).length > 0);
 
   const shouldRenderContinueButton = () =>
     !isLastQuestion(questionIds, stepIndex);
@@ -337,7 +336,7 @@ const SubmissionEditStepForm = (props) => {
       onConfirm={() => {
         setResetConfirmation(false);
         setResetAnswerId(null);
-        onReset(resetAnswerId, setValue, resetField);
+        onReset(resetAnswerId, setValue);
       }}
       message={intl.formatMessage(translations.resetConfirmation)}
     />
