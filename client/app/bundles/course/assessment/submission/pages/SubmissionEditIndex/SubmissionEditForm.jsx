@@ -316,7 +316,12 @@ const SubmissionEditForm = (props) => {
                 }
                 id="run-code"
                 onClick={() =>
-                  onSubmitAnswer(answerId, getValues(`${answerId}`), setValue, resetField)
+                  onSubmitAnswer(
+                    answerId,
+                    getValues(`${answerId}`),
+                    setValue,
+                    resetField,
+                  )
                 }
                 style={styles.formButton}
               >

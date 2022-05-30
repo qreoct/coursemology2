@@ -4,6 +4,7 @@ import pollJob from 'lib/helpers/job-helpers';
 /* eslint-enable import/extensions, import/no-extraneous-dependencies, import/no-unresolved */
 import actionTypes from '../constants';
 import translations from '../translations';
+import { resetArrayFields, resetObjectFields } from '../utils';
 
 const JOB_POLL_DELAY = 500;
 const JOB_STAGGER_DELAY = 400;
@@ -59,39 +60,13 @@ function buildErrorMessage(error) {
     .join(', ');
 }
 
-/**
- * Resets the following fields in react-hook-form
- * and sets their initialValue to this value
- */
-const resetFields = (fields, id, resetField) => {
-  Object.keys(fields).forEach((fieldName) => {
-    if (fieldName === 'files_attributes') {
-      resetArrayField(fields[fieldName], resetField, `${id}.${fieldName}`);
-    } else {
-      console.log(`resetting ${id}.${fieldName} to ${fields[fieldName]}`);
-      resetField(`${id}.${fieldName}`, {
-        defaultValue: fields[fieldName],
-      });
-    }
-  });
-};
-
-// workaround for react-hook-array not being able to reset an arrayfield when array is passed in
-const resetArrayField = (array, fn, path = "") => {
-  const fieldPath = path === "" ? "" : `${path}.`;
-  console.log("(resetarrayfield START) resetting", array);
-  array.forEach((obj, index) => {
-    Object.keys(obj).forEach((fieldName) => {
-      // if (fieldName === 'staged') return;
-      console.log(`(resetarrayfield) resetting ${fieldPath}${index}.${fieldName} to ${obj[fieldName]}`);
-      fn(`${fieldPath}${index}.${fieldName}`, {
-        defaultValue: obj[fieldName],
-      });
-    });
-  });
-}
-
-function getEvaluationResult(submissionId, answerId, questionId, setValue, resetField) {
+function getEvaluationResult(
+  submissionId,
+  answerId,
+  questionId,
+  setValue,
+  resetField,
+) {
   return (dispatch) => {
     CourseAPI.assessment.submissions
       .reloadAnswer(submissionId, { answer_id: answerId })
@@ -103,9 +78,13 @@ function getEvaluationResult(submissionId, answerId, questionId, setValue, reset
           questionId,
         });
         if (setValue !== undefined && resetField !== undefined) {
-          console.log(`SET ${answerId}.files_attributes TO`, data.fields.files_attributes);
-          setValue(`${answerId}.files_attributes`, data.fields.files_attributes);
-          resetFields(data.fields, answerId, resetField);
+          // have to setValue first to clear any `staged` properties
+          // before resetField
+          setValue(
+            `${answerId}.files_attributes`,
+            data.fields.files_attributes,
+          );
+          resetObjectFields(data.fields, answerId, resetField);
         }
       })
       .catch(() => {
@@ -252,12 +231,16 @@ export function unsubmit(submissionId) {
   };
 }
 
-export function submitAnswer(submissionId, answerId, rawAnswer, setValue, resetField) {
+export function submitAnswer(
+  submissionId,
+  answerId,
+  rawAnswer,
+  setValue,
+  resetField,
+) {
   const answer = formatAnswer(rawAnswer);
   const payload = { answer };
   const questionId = answer.questionId;
-
-  console.log("(submitAnswer)", answer);
 
   return (dispatch) => {
     dispatch({ type: actionTypes.AUTOGRADE_REQUEST, questionId });
@@ -297,12 +280,9 @@ export function submitAnswer(submissionId, answerId, rawAnswer, setValue, resetF
             payload: data,
             questionId,
           });
-          // When an answer is submitted, the value of that field needs to be updated.
-          // setValue(`${answerId}`, data.fields);
-
           // When an answer is submitted, update default value of field for form
           // Need to individually reset fields https://github.com/react-hook-form/react-hook-form/issues/7841
-          resetFields(data.fields, answerId, resetField);
+          resetObjectFields(data.fields, answerId, resetField);
         }
       })
       .catch(() => {
@@ -312,7 +292,7 @@ export function submitAnswer(submissionId, answerId, rawAnswer, setValue, resetF
   };
 }
 
-export function resetAnswer(submissionId, answerId, questionId, setValue, resetField) {
+export function resetAnswer(submissionId, answerId, questionId, setValue) {
   const payload = { answer_id: answerId, reset_answer: true };
   return (dispatch) => {
     dispatch({ type: actionTypes.RESET_REQUEST, questionId });
@@ -326,9 +306,9 @@ export function resetAnswer(submissionId, answerId, questionId, setValue, resetF
           payload: data,
           questionId,
         });
-        console.log("(resetting prog question) resetAnswer fields are ", data.fields);
+        // we leave the form dirty, since after reset
+        // the user should resubmit
         setValue(`${answerId}`, data.fields);
-        // resetFields(data.fields, answerId, resetField);
       })
       .catch(() => dispatch({ type: actionTypes.RESET_FAILURE, questionId }));
   };
@@ -346,25 +326,25 @@ export function deleteFile(answerId, fileId, answers, setValue, resetField) {
       .then((response) => response.data)
       .then((data) => {
         const responsePayload = { questionId: answer.questionId, answer: data };
-        console.log("comparing responsepayload", [responsePayload]);
-        console.log("with data", [data]);
         dispatch({
           type: actionTypes.DELETE_FILE_SUCCESS,
           payload: responsePayload,
         });
 
-        // When an uploaded programming file is deleted, we need to update the field value
-        // excluding the deleted file.
         const newFilesAttributes = answer.files_attributes.filter(
           (file) => file.id !== fileId,
         );
+
+        // When an uploaded programming file is deleted, we need to update the field value
+        // excluding the deleted file.
         setValue(`${answerId}.files_attributes`, newFilesAttributes, {
           shouldDirty: false,
-        }); // original
-        console.log("calling resetarrayfield from DELETE_FILE");
-
-        // resetField(`${answerId}.files_attributes`, newFilesAttributes);
-        resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
+        });
+        resetArrayFields(
+          newFilesAttributes,
+          resetField,
+          `${answerId}.files_attributes`,
+        );
 
         dispatch(setNotification(translations.deleteFileSuccess));
       })
@@ -396,7 +376,13 @@ function validateJavaFiles(files) {
 }
 
 // Imports staged files into the question to be evaluated
-export function importFiles(answerId, answerFields, language, setValue, resetField) {
+export function importFiles(
+  answerId,
+  answerFields,
+  language,
+  setValue,
+  resetField,
+) {
   const answer = Object.values(answerFields).find((ans) => ans.id === answerId);
   const files = answerFields[answerId].files_attributes;
   const payload = { answer: { id: answerId, ...answer } };
@@ -425,13 +411,16 @@ export function importFiles(answerId, answerFields, language, setValue, resetFie
           const newFilesAttributes = data.fields.files_attributes.map(
             (file) => ({ ...file, staged: false }),
           );
-          // resetFields(newFilesAttributes, answerId, resetField);
 
+          // When an uploaded programming file is uploaded, we need to update the field value
+          // Have to use setValue first to include `staged` property, then reset initial values
+          setValue(`${answerId}.files_attributes`, newFilesAttributes);
+          resetArrayFields(
+            newFilesAttributes,
+            resetField,
+            `${answerId}.files_attributes`,
+          );
 
-          console.log(`originally, i was setting ${answerId}.files_attributes to `, newFilesAttributes);
-          setValue(`${answerId}.files_attributes`, newFilesAttributes); // original
-          resetArrayField(newFilesAttributes, resetField, `${answerId}.files_attributes`);
-          // import_files field is reset to remove files from dropbox.
           setValue(`${answerId}.import_files`, []); // original
           resetField(`${answerId}.import_files`, {
             defaultValue: [],

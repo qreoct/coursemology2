@@ -11,7 +11,7 @@ import ReadOnlyEditor from './ReadOnlyEditor';
 import { importFiles, deleteFile } from '../actions';
 import translations from '../translations';
 import { questionShape, fileShape } from '../propTypes';
-import { parseLanguages } from '../utils';
+import { resetArrayFields, parseLanguages } from '../utils';
 
 const styles = {
   formButton: {
@@ -134,30 +134,18 @@ const stageFiles = async (props) => {
       (file) => !file.staged,
     );
 
+    // Call setValue first to update fields in react-hook-form,
+    // followed by reset to set clean the form
     setValue(`${answerId}.files_attributes`, filteredFiles.concat(newFiles), {
       shouldDirty: false,
-    }); // original
-    console.log("here");
-    resetArrayField(filteredFiles.concat(newFiles), resetField, `${answerId}.files_attributes`);
-    // resetField(`${answerId}.files_attributes`, {
-      // defaultValue: filteredFiles.concat(newFiles),
-    // })
+    });
+    resetArrayFields(
+      filteredFiles.concat(newFiles),
+      resetField,
+      `${answerId}.files_attributes`,
+    );
   });
 };
-
-const resetArrayField = (array, fn, path = "") => {
-  const fieldPath = path === "" ? "" : `${path}.`;
-  console.log("(file import editor resetarrayfield START) resetting", array);
-  array.forEach((obj, index) => {
-    Object.keys(obj).forEach((fieldName) => {
-      // if (fieldName === 'staged') return;
-      // console.log(`(resetarrayfield) resetting ${fieldPath}${index}.${fieldName} to ${obj[fieldName]}`);
-      fn(`${fieldPath}${index}.${fieldName}`, {
-        defaultValue: obj[fieldName],
-      });
-    });
-  });
-}
 
 const VisibleProgrammingImportEditor = (props) => {
   const [displayFileIndex, setDisplayFileIndex] = useState(0);
@@ -241,7 +229,13 @@ const VisibleProgrammingImportEditor = (props) => {
             disabled={disableImport}
             onClick={() =>
               dispatch(
-                importFiles(answerId, answers, question.language, setValue, resetField),
+                importFiles(
+                  answerId,
+                  answers,
+                  question.language,
+                  setValue,
+                  resetField,
+                ),
               )
             }
             style={styles.formButton}

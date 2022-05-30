@@ -129,11 +129,6 @@ const SubmissionEditStepForm = (props) => {
     reset(initialValues);
   }, [initialValues]);
 
-  useEffect(() => {
-    console.log(`isSaving ${isSaving} isDirty ${isDirty} allcorrect ${allConsideredCorrect}`);
-    console.log("current form values:", getValues());
-  }, [isDirty, allConsideredCorrect, isSaving]);
-
   const handleNext = () => {
     setMaxStep(Math.max(maxStep, stepIndex + 1));
     setStepIndex(stepIndex + 1);
@@ -166,12 +161,8 @@ const SubmissionEditStepForm = (props) => {
   };
 
   const shouldDisableFinaliseButton = () => {
-    const df = Object.keys(dirtyFields).map((x) => ({
-      field: x,
-      value: getValues(x),
-    }));
-    console.log("dirtyfields:", df);
-    return isSaving || (!allowPartialSubmission && isDirty && df.length > 0);
+    return isSaving ||
+      (!allowPartialSubmission && isDirty && Object.keys(dirtyFields).length > 0);
   };
 
   const shouldRenderContinueButton = () =>
@@ -406,7 +397,12 @@ const SubmissionEditStepForm = (props) => {
         <Hotkeys
           keyName="command+enter,control+enter"
           onKeyDown={() =>
-            onSubmitAnswer(answerId, getValues(`${answerId}`), setValue, resetField)
+            onSubmitAnswer(
+              answerId,
+              getValues(`${answerId}`),
+              setValue,
+              resetField,
+            )
           }
           disabled={isAutograding || isResetting || isSaving}
           filter={() => true}
@@ -417,7 +413,12 @@ const SubmissionEditStepForm = (props) => {
             color="secondary"
             disabled={isAutograding || isResetting || isSaving}
             onClick={() =>
-              onSubmitAnswer(answerId, getValues(`${answerId}`), setValue, resetField)
+              onSubmitAnswer(
+                answerId,
+                getValues(`${answerId}`),
+                setValue,
+                resetField,
+              )
             }
             style={styles.formButton}
           >

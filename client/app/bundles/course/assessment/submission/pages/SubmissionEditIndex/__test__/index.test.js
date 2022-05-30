@@ -64,7 +64,7 @@ const errorSubmission = {
         file: {},
       },
       answerStatus: {
-        1: {isLatestAnswer: true},
+        1: { isLatestAnswer: true },
       },
       grading: {
         grade: null,
@@ -138,7 +138,7 @@ const successSubmission = {
         file: { url: 'http://test.org/file.wav', name: 'file.wav' },
       },
       answerStatus: {
-        1: {isLatestAnswer: true},
+        1: { isLatestAnswer: true },
       },
       grading: {
         grade: null,

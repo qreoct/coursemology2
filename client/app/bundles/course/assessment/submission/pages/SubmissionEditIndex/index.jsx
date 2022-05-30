@@ -158,7 +158,15 @@ class VisibleSubmissionEditIndex extends Component {
       match: { params },
     } = this.props;
     const questionId = answers.initial[answerId].questionId;
-    dispatch(resetAnswer(params.submissionId, answerId, questionId, setValue, resetField));
+    dispatch(
+      resetAnswer(
+        params.submissionId,
+        answerId,
+        questionId,
+        setValue,
+        resetField,
+      ),
+    );
   };
 
   onSaveDraft = (data) => {
@@ -182,7 +190,9 @@ class VisibleSubmissionEditIndex extends Component {
       dispatch,
       match: { params },
     } = this.props;
-    dispatch(submitAnswer(params.submissionId, answerId, answer, setValue, resetField));
+    dispatch(
+      submitAnswer(params.submissionId, answerId, answer, setValue, resetField),
+    );
   };
 
   allConsideredCorrect() {

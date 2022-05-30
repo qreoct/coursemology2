@@ -50,7 +50,7 @@ const mockSubmission = {
         questionId: 1,
       },
       answerStatus: {
-        1: {isLatestAnswer: true},
+        1: { isLatestAnswer: true },
       },
       grading: {
         grade: null,
