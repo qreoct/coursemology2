@@ -1,8 +1,5 @@
 import { produce } from 'immer';
-import {
-  UserEntity,
-  UserMiniEntity,
-} from 'types/course/users';
+import { UserEntity, UserMiniEntity } from 'types/course/users';
 import {
   createEntityStore,
   saveEntityToStore,

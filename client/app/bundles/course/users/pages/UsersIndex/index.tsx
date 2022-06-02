@@ -1,4 +1,4 @@
-import { FC, ReactElement, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -64,7 +64,6 @@ const UsersIndex: FC<Props> = (props) => {
           id: 'course.users.header',
           defaultMessage: 'Students',
         })}
-        toolbars={headerToolbars}
       />
       <Grid container>
         {largeUsers.map((courseUser) => (
