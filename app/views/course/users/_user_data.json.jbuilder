@@ -39,3 +39,8 @@ if can_read_progress && all_skill_branches.present?
     end
   end
 end
+
+# NOTE: Facebook login feature is currently disabled
+# if facebook = course_user.user.identities.facebook.first
+#   json.facebookUrl "https://www.facebook.com/#{facebook.uid}"
+# end
