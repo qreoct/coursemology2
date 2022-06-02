@@ -24,7 +24,3 @@ export function getAllUserMiniEntities(state: AppState) {
     getLocalState(state).users.ids,
   );
 }
-
-// export function getAchievementPermissions(state: AppState) {
-//   return getLocalState(state).permissions as AchievementPermissions;
-// }

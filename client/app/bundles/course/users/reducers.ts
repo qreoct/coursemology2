@@ -1,13 +1,11 @@
 import { produce } from 'immer';
 import {
-  //   AchievementCourseUserEntity,
   UserEntity,
   UserMiniEntity,
 } from 'types/course/users';
 import {
   createEntityStore,
   saveEntityToStore,
-  //   removeFromStore,
   saveListToStore,
 } from 'utilities/store';
 import {

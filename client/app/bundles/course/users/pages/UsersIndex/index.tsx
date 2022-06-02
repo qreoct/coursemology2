@@ -43,9 +43,6 @@ const UsersIndex: FC<Props> = (props) => {
   const users = useSelector((state: AppState) => getAllUserMiniEntities(state));
   const smallUsers = users.concat(users).concat(users).concat(users);
   const largeUsers = smallUsers.concat(smallUsers).concat(smallUsers);
-  //   const achievementPermissions = useSelector((state: AppState) =>
-  //     getAchievementPermissions(state),
-  //   );
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -59,29 +56,6 @@ const UsersIndex: FC<Props> = (props) => {
   if (isLoading) {
     return <LoadingIndicator />;
   }
-
-  const headerToolbars: ReactElement[] = []; // To Add: Reorder Button
-
-  //   if (achievementPermissions?.canReorder) {
-  //     headerToolbars.push(
-  //       <AchievementReordering key="achievementReorderingButton" />,
-  //     );
-  //   }
-
-  //   if (achievementPermissions?.canCreate) {
-  //     headerToolbars.push(
-  //       <Button
-  //         className="new-achievement-button"
-  //         key="new-achievement-button"
-  //         variant="outlined"
-  //         color="primary"
-  //         onClick={(): void => setIsOpen(true)}
-  //         style={styles.newButton}
-  //       >
-  //         {intl.formatMessage(translations.newAchievement)}
-  //       </Button>,
-  //     );
-  //   }
 
   return (
     <>

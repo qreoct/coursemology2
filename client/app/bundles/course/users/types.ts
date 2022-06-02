@@ -28,7 +28,6 @@ export interface SaveUserAction {
 export interface UsersState {
   permissions: UserPermissions;
   users: EntityStore<UserMiniEntity, UserEntity>;
-  //   permissions: UsersPermissions | null;
 }
 
 export type UsersActionType = SaveUsersListAction | SaveUserAction;
