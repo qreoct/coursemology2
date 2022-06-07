@@ -6,13 +6,13 @@ import ConfirmationDialog from '../ConfirmationDialog';
 interface Props extends IconButtonProps {
   disabled: boolean;
   onClick: () => Promise<void>;
-  withDialog: boolean;
+  confirmMessage: string;
 }
 
 const DeleteButton = ({
   disabled,
   onClick,
-  withDialog,
+  confirmMessage,
   ...props
 }: Props): JSX.Element => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -21,7 +21,7 @@ const DeleteButton = ({
     <>
       <IconButton
         onClick={(): void => {
-          if (withDialog) {
+          if (confirmMessage) {
             setDialogOpen(true);
           } else {
             onClick();
@@ -34,7 +34,7 @@ const DeleteButton = ({
       </IconButton>
       {dialogOpen && (
         <ConfirmationDialog
-          message="Are you sure you wish to delete this achievement?"
+          message={confirmMessage}
           disableCancelButton={disabled}
           disableConfirmButton={disabled}
           open={dialogOpen}

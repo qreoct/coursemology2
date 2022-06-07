@@ -3,6 +3,11 @@ export const getCourseURL = (courseId) => `/courses/${courseId}`;
 export const getCourseUserURL = (courseId, courseUserId) =>
   `/courses/${courseId}/users/${courseUserId}`;
 
+export const getCourseUserStudentsURL = (courseId) =>
+  `courses/${courseId}/students`;
+
+export const getCourseUserStaffURL = (courseId) => `courses/${courseId}/staff`;
+
 export const getAchievementURL = (courseId, achievementId) =>
   `/courses/${courseId}/achievements/${achievementId}`;
 
