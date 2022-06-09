@@ -2,7 +2,8 @@ import { AxiosResponse } from 'axios';
 import {
   CourseUserData,
   CourseUserListData,
-  CourseUsersPermissions,
+  ManageCourseUsersPermissions,
+  ManageCourseUsersTabData,
   UpdateCourseUserPatchData,
 } from 'types/course/course_users';
 import BaseCourseAPI from './Base';
@@ -27,7 +28,8 @@ export default class UsersAPI extends BaseCourseAPI {
   indexStudents(): Promise<
     AxiosResponse<{
       users: CourseUserData[];
-      permissions: CourseUsersPermissions;
+      permissions: ManageCourseUsersPermissions;
+      manageCourseUsersData: ManageCourseUsersTabData;
     }>
   > {
     return this.getClient().get(`${this._baseUrlPrefix}/students`);
@@ -39,7 +41,8 @@ export default class UsersAPI extends BaseCourseAPI {
   indexStaff(): Promise<
     AxiosResponse<{
       users: CourseUserData[];
-      permissions: CourseUsersPermissions;
+      permissions: ManageCourseUsersPermissions;
+      manageCourseUsersData: ManageCourseUsersTabData;
     }>
   > {
     return this.getClient().get(`${this._baseUrlPrefix}/staff`);

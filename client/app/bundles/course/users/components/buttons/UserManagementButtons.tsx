@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import DeleteButton from 'lib/components/buttons/DeleteButton';
 import SaveButton from 'lib/components/buttons/SaveButton';
 import { CourseUserData } from 'types/course/course_users';
@@ -8,9 +8,8 @@ import { toast } from 'react-toastify';
 import { AppDispatch } from 'types/store';
 import { updateUser, deleteUser } from '../../operations';
 
-interface Props {
+interface Props extends WrappedComponentProps {
   user: CourseUserData;
-  intl?: any;
 }
 
 const translations = defineMessages({
@@ -37,7 +36,7 @@ const translations = defineMessages({
 });
 
 const UserManagementButtons: FC<Props> = (props) => {
-  const { user, intl } = props;
+  const { intl, user } = props;
   const dispatch = useDispatch<AppDispatch>();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -80,11 +79,13 @@ const UserManagementButtons: FC<Props> = (props) => {
   const managementButtons = (
     <div style={{ whiteSpace: 'nowrap' }}>
       <SaveButton
+        tooltip="Save Changes"
         className={`user-save-${user.id}`}
         disabled={isDeleting || isSaving}
         onClick={() => onSave(user)}
       />
       <DeleteButton
+        tooltip="Delete User"
         className={`user-delete-${user.id}`}
         disabled={isDeleting || isSaving}
         onClick={onDelete}

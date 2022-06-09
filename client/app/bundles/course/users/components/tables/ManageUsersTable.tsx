@@ -1,27 +1,67 @@
-import { FC } from 'react';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { Checkbox, MenuItem, TextField, Typography } from '@mui/material';
+import { FC, ReactElement } from 'react';
+import {
+  defineMessages,
+  FormattedMessage,
+  injectIntl,
+  WrappedComponentProps,
+} from 'react-intl';
+import { Box, Checkbox, MenuItem, TextField, Typography } from '@mui/material';
 import DataTable from 'lib/components/DataTable';
 import {
   CourseUserEntity,
-  CourseUsersPermissions,
+  ManageCourseUsersPermissions,
 } from 'types/course/course_users';
 import Note from 'lib/components/Note';
 import rebuildObjectFromRow from 'lib/helpers/mui-datatables-helpers';
-import UserManagementButtons from '../buttons/UserManagementButtons';
 import sharedConstants from 'lib/constants/sharedConstants';
+import { InvitationEntity } from 'types/course/user_invitations';
 
-interface Props {
+interface Props extends WrappedComponentProps {
   title: string;
-  users: CourseUserEntity[];
-  permissions: CourseUsersPermissions | null;
-  showRoleColumn?: boolean;
+  users: CourseUserEntity[] | InvitationEntity[];
+  permissions: ManageCourseUsersPermissions | null;
+  manageStaff?: boolean;
+  // pendingInvitations?: boolean;
+  // acceptedInvitations?: boolean;
+  renderRowActionComponent?: (any) => ReactElement;
 }
 
 const translations = defineMessages({
   noUsers: {
     id: 'course.users.components.tables.ManageUsersTable.noUsers',
     defaultMessage: 'There are no users',
+  },
+  searchText: {
+    id: 'course.users.components.tables.ManageUsersTable.searchText',
+    defaultMessage: 'Search by name, email, role, etc.',
+  },
+  idColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.id',
+    defaultMessage: 'id',
+  },
+  nameColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.name',
+    defaultMessage: 'Name',
+  },
+  emailColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.email',
+    defaultMessage: 'Email',
+  },
+  phantomColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.phantom',
+    defaultMessage: 'Phantom',
+  },
+  roleColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.role',
+    defaultMessage: 'Role',
+  },
+  timelineAlgorithmColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.timelineAlgorithm',
+    defaultMessage: 'Timeline Algorithm',
+  },
+  actionsColumn: {
+    id: 'course.users.components.tables.ManageUsersTable.column.actions',
+    defaultMessage: 'Actions',
   },
 });
 
@@ -41,7 +81,14 @@ const styles = {
 };
 
 const ManageUsersTable: FC<Props> = (props) => {
-  const { title, users, permissions, showRoleColumn = false } = props;
+  const {
+    title,
+    users,
+    permissions,
+    manageStaff = false,
+    renderRowActionComponent = null,
+    intl,
+  } = props;
 
   if (users && users.length === 0) {
     return <Note message={<FormattedMessage {...translations.noUsers} />} />;
@@ -55,6 +102,7 @@ const ManageUsersTable: FC<Props> = (props) => {
     rowsPerPage: 30,
     rowsPerPageOptions: [15, 30, 50],
     search: true,
+    searchPlaceholder: intl.formatMessage(translations.searchText),
     selectableRows: 'none',
     setRowProps: (
       _row: Array<any>,
@@ -75,7 +123,7 @@ const ManageUsersTable: FC<Props> = (props) => {
   const columns: any = [
     {
       name: 'id',
-      label: 'id',
+      label: intl.formatMessage(translations.idColumn),
       options: {
         display: false,
         filter: false,
@@ -84,7 +132,7 @@ const ManageUsersTable: FC<Props> = (props) => {
     },
     {
       name: 'name',
-      label: 'Name',
+      label: intl.formatMessage(translations.nameColumn),
       options: {
         alignCenter: false,
         customBodyRender: (value, _tableMeta, updateValue): JSX.Element => {
@@ -101,7 +149,7 @@ const ManageUsersTable: FC<Props> = (props) => {
     },
     {
       name: 'email',
-      label: 'Email',
+      label: intl.formatMessage(translations.emailColumn),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -116,7 +164,7 @@ const ManageUsersTable: FC<Props> = (props) => {
     },
     {
       name: 'phantom',
-      label: 'Phantom',
+      label: intl.formatMessage(translations.phantomColumn),
       options: {
         customBodyRender: (value, tableMeta, updateValue): JSX.Element => {
           const user = tableMeta.tableData[tableMeta.rowIndex];
@@ -137,7 +185,7 @@ const ManageUsersTable: FC<Props> = (props) => {
   if (permissions?.canManagePersonalTimes) {
     columns.push({
       name: 'timelineAlgorithm',
-      label: 'Timeline Algorithm',
+      label: intl.formatMessage(translations.timelineAlgorithmColumn),
       options: {
         alignCenter: false,
         customBodyRender: (value, tableMeta, updateValue): JSX.Element => {
@@ -165,10 +213,10 @@ const ManageUsersTable: FC<Props> = (props) => {
     });
   }
 
-  if (showRoleColumn && permissions?.canManageCourseUsers) {
+  if (manageStaff && permissions?.canManageCourseUsers) {
     columns.push({
       name: 'role',
-      label: 'Role',
+      label: intl.formatMessage(translations.roleColumn),
       options: {
         alignCenter: false,
         customBodyRender: (value, tableMeta, updateValue): JSX.Element => {
@@ -196,30 +244,36 @@ const ManageUsersTable: FC<Props> = (props) => {
     });
   }
 
-  columns.push({
-    name: 'actions',
-    label: 'Actions',
-    options: {
-      empty: true,
-      sort: false,
-      alignCenter: true,
-      customBodyRender: (_value, tableMeta): JSX.Element => {
-        const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
-        const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
-        return <UserManagementButtons user={user} />;
-      },
-    },
-  });
+  {
+    renderRowActionComponent &&
+      columns.push({
+        name: 'actions',
+        label: intl.formatMessage(translations.actionsColumn),
+        options: {
+          empty: true,
+          sort: false,
+          alignCenter: true,
+          customBodyRender: (_value, tableMeta): JSX.Element => {
+            const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
+            const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
+            const actionComponent = renderRowActionComponent(user);
+            return actionComponent;
+          },
+        },
+      });
+  }
 
   return (
-    <DataTable
-      title={title}
-      data={users}
-      columns={columns}
-      options={options}
-      includeRowNumber
-    />
+    <Box sx={{ margin: '12px 0px' }}>
+      <DataTable
+        title={title}
+        data={users}
+        columns={columns}
+        options={options}
+        includeRowNumber
+      />
+    </Box>
   );
 };
 
-export default ManageUsersTable;
+export default injectIntl(ManageUsersTable);

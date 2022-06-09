@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Typography } from '@mui/material';
@@ -10,15 +10,15 @@ import { fetchStaff } from '../../operations';
 import {
   getAllStudentsEntities,
   getAllStaffEntities,
-  getCourseUserPermissions,
+  getManageCourseUserPermissions,
+  getManageCourseUsersTabData,
 } from '../../selectors';
 import UserManagementTabs from '../../components/navigation/UserManagementTabs';
 import ManageUsersTable from '../../components/tables/ManageUsersTable';
 import UpgradeToStaff from '../../components/misc/UpgradeToStaff';
+import UserManagementButtons from '../../components/buttons/UserManagementButtons';
 
-interface Props {
-  intl?: any;
-}
+type Props = WrappedComponentProps;
 
 // const styles = {
 //   courseUserImage: {
@@ -36,7 +36,7 @@ const translations = defineMessages({
     id: 'course.users.manage.header',
     defaultMessage: 'Manage Users',
   },
-  noStudents: {
+  noStaff: {
     id: 'course.users.manage.noStaff',
     defaultMessage: 'No staff in course',
   },
@@ -54,7 +54,10 @@ const ManageStaff: FC<Props> = (props) => {
   );
   const staff = useSelector((state: AppState) => getAllStaffEntities(state));
   const permissions = useSelector((state: AppState) =>
-    getCourseUserPermissions(state),
+    getManageCourseUserPermissions(state),
+  );
+  const tabData = useSelector((state: AppState) =>
+    getManageCourseUsersTabData(state),
   );
   const dispatch = useDispatch<AppDispatch>();
 
@@ -81,14 +84,17 @@ const ManageStaff: FC<Props> = (props) => {
   return (
     <>
       <PageHeader title={intl.formatMessage(translations.manageUsersHeader)} />
-      <UserManagementTabs permissions={permissions} />
+      <UserManagementTabs permissions={permissions} tabData={tabData} />
       <UpgradeToStaff students={students} />
       {staff.length > 0 ? (
         <ManageUsersTable
           title="Staff"
           users={staff}
           permissions={permissions}
-          showRoleColumn={true}
+          manageStaff={true}
+          renderRowActionComponent={(user) => (
+            <UserManagementButtons user={user} />
+          )}
         />
       ) : (
         renderEmptyState()

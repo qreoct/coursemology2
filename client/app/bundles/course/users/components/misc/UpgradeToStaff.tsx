@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import {
   Autocomplete,
   Box,
@@ -17,9 +17,8 @@ import { upgradeToStaff } from '../../operations';
 import sharedConstants from 'lib/constants/sharedConstants';
 import { CourseUserData } from 'types/course/course_users';
 
-interface Props {
+interface Props extends WrappedComponentProps {
   students: CourseUserData[];
-  intl?: any;
 }
 
 const translations = defineMessages({

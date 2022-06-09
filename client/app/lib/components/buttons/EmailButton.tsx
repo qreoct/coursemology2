@@ -1,21 +1,21 @@
 import { IconButton, IconButtonProps, Tooltip } from '@mui/material';
-import Save from '@mui/icons-material/Save';
+import Email from '@mui/icons-material/Email';
 
 interface Props extends IconButtonProps {
   onClick: (SyntheticEvent: any) => void;
   tooltip?: string;
 }
 
-const SaveButton = ({
+const EmailButton = ({
   onClick,
   tooltip = '',
   ...props
 }: Props): JSX.Element => (
   <Tooltip title={tooltip}>
     <IconButton onClick={onClick} color="inherit" {...props}>
-      <Save />
+      <Email />
     </IconButton>
   </Tooltip>
 );
 
-export default SaveButton;
+export default EmailButton;
