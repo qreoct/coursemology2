@@ -1,4 +1,4 @@
-import { FC, ReactElement } from 'react';
+import React, { FC, ReactElement } from 'react';
 import {
   defineMessages,
   FormattedMessage,
@@ -21,8 +21,6 @@ interface Props extends WrappedComponentProps {
   users: CourseUserEntity[] | InvitationEntity[];
   permissions: ManageCourseUsersPermissions | null;
   manageStaff?: boolean;
-  // pendingInvitations?: boolean;
-  // acceptedInvitations?: boolean;
   renderRowActionComponent?: (any) => ReactElement;
 }
 
@@ -139,7 +137,9 @@ const ManageUsersTable: FC<Props> = (props) => {
           return (
             <TextField
               value={value}
-              onChange={(event) => updateValue(event.target.value)}
+              onChange={(event): React.ChangeEvent =>
+                updateValue(event.target.value)
+              }
               style={styles.textField}
               variant="standard"
             />
@@ -174,7 +174,7 @@ const ManageUsersTable: FC<Props> = (props) => {
               key={`checkbox_${user.id}`}
               checked={value}
               style={styles.checkbox}
-              onChange={(e) => updateValue(e.target.checked)}
+              onChange={(e): React.ChangeEvent => updateValue(e.target.checked)}
             />
           );
         },
@@ -195,7 +195,7 @@ const ManageUsersTable: FC<Props> = (props) => {
               id={`timeline-algorithm-${user.id}`}
               select
               value={value}
-              onChange={(e) => updateValue(e.target.value)}
+              onChange={(e): React.ChangeEvent => updateValue(e.target.value)}
               variant="standard"
             >
               {sharedConstants.TIMELINE_ALGORITHMS.map((option) => (
@@ -226,7 +226,7 @@ const ManageUsersTable: FC<Props> = (props) => {
               id={`role-${user.id}`}
               select
               value={value}
-              onChange={(e) => updateValue(e.target.value)}
+              onChange={(e): React.ChangeEvent => updateValue(e.target.value)}
               variant="standard"
             >
               {sharedConstants.USER_ROLES.map((option) => (
@@ -244,23 +244,22 @@ const ManageUsersTable: FC<Props> = (props) => {
     });
   }
 
-  {
-    renderRowActionComponent &&
-      columns.push({
-        name: 'actions',
-        label: intl.formatMessage(translations.actionsColumn),
-        options: {
-          empty: true,
-          sort: false,
-          alignCenter: true,
-          customBodyRender: (_value, tableMeta): JSX.Element => {
-            const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
-            const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
-            const actionComponent = renderRowActionComponent(user);
-            return actionComponent;
-          },
+  if (renderRowActionComponent) {
+    columns.push({
+      name: 'actions',
+      label: intl.formatMessage(translations.actionsColumn),
+      options: {
+        empty: true,
+        sort: false,
+        alignCenter: true,
+        customBodyRender: (_value, tableMeta): JSX.Element => {
+          const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
+          const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
+          const actionComponent = renderRowActionComponent(user);
+          return actionComponent;
         },
-      });
+      },
+    });
   }
 
   return (

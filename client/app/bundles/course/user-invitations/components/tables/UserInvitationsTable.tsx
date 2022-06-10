@@ -10,6 +10,7 @@ import DataTable from 'lib/components/DataTable';
 import Note from 'lib/components/Note';
 import rebuildObjectFromRow from 'lib/helpers/mui-datatables-helpers';
 import { InvitationEntity } from 'types/course/user_invitations';
+import sharedConstants from 'lib/constants/sharedConstants';
 import ResendInvitationsButton from '../buttons/ResendAllInvitationsButton';
 
 interface Props extends WrappedComponentProps {
@@ -163,7 +164,11 @@ const UserInvitationsTable: FC<Props> = (props) => {
           const invitation = invitations[dataIndex];
           return (
             <Typography key={`role-${invitation.id}`} variant="body2">
-              {invitation.role}
+              {
+                sharedConstants.USER_ROLES.find(
+                  (role) => role.value === invitation.role,
+                )?.label
+              }
             </Typography>
           );
         },
@@ -237,23 +242,22 @@ const UserInvitationsTable: FC<Props> = (props) => {
     });
   }
 
-  {
-    renderRowActionComponent &&
-      columns.push({
-        name: 'actions',
-        label: intl.formatMessage(translations.actionsColumn),
-        options: {
-          empty: true,
-          sort: false,
-          alignCenter: true,
-          customBodyRender: (_value, tableMeta): JSX.Element => {
-            const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
-            const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
-            const actionComponent = renderRowActionComponent(user);
-            return actionComponent;
-          },
+  if (renderRowActionComponent) {
+    columns.push({
+      name: 'actions',
+      label: intl.formatMessage(translations.actionsColumn),
+      options: {
+        empty: true,
+        sort: false,
+        alignCenter: true,
+        customBodyRender: (_value, tableMeta): JSX.Element => {
+          const rowData = tableMeta.currentTableData[tableMeta.rowIndex];
+          const user = rebuildObjectFromRow(columns, rowData); // maybe can optimize if we push this function to within the buttons?
+          const actionComponent = renderRowActionComponent(user);
+          return actionComponent;
         },
-      });
+      },
+    });
   }
 
   return (

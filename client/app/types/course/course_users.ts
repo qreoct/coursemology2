@@ -7,7 +7,10 @@ import { SkillBranchData, SkillBranchEntity } from './assessment/skills/skills';
 import { TimelineAlgorithm } from './personal_times';
 
 export type ManageCourseUsersPermissions = Permissions<
-  'canManageCourseUsers' | 'canManageEnrolRequests' | 'canManagePersonalTimes'
+  | 'canManageCourseUsers'
+  | 'canManageEnrolRequests'
+  | 'canManagePersonalTimes'
+  | 'canRegisterWithCode'
 >;
 
 export interface CourseUserListData {

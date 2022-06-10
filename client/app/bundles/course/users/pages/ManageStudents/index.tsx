@@ -78,7 +78,7 @@ const ManageStudents: FC<Props> = (props) => {
           title="Students"
           users={students}
           permissions={permissions}
-          renderRowActionComponent={(user) => (
+          renderRowActionComponent={(user): JSX.Element => (
             <UserManagementButtons user={user} />
           )}
         />

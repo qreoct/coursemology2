@@ -48,7 +48,7 @@ const styles = {
   },
 };
 
-interface Tab {
+interface TabData {
   label: { id: string; defaultMessage: string };
   href?: string;
   count?: number;
@@ -56,7 +56,7 @@ interface Tab {
 
 const courseUrl = getCourseURL(getCourseId());
 
-const LinkTab = (props: any) => {
+const LinkTab = (props: any): JSX.Element => {
   return <Tab component="a" {...props} sx={styles.tabStyle} />;
 };
 
@@ -90,18 +90,18 @@ const allTabs = {
 const generateTabs = (
   permissions: ManageCourseUsersPermissions,
   tabData: ManageCourseUsersTabData,
-) => {
-  const tabs: Tab[] = [];
+): TabData[] => {
+  const tabs: TabData[] = [];
   if (permissions.canManageCourseUsers) {
     tabs.push(allTabs.studentsTab);
     tabs.push(allTabs.staffTab);
   }
   if (permissions.canManageEnrolRequests) {
-    allTabs.enrolRequestsTab['count'] = tabData.requestsCount;
+    allTabs.enrolRequestsTab.count = tabData.requestsCount;
     tabs.push(allTabs.enrolRequestsTab);
   }
   tabs.push(allTabs.inviteTab);
-  allTabs.userInvitationsTab['count'] = tabData.invitationsCount;
+  allTabs.userInvitationsTab.count = tabData.invitationsCount;
   tabs.push(allTabs.userInvitationsTab);
   if (permissions.canManagePersonalTimes) {
     tabs.push(allTabs.personalTimesTab);
@@ -114,12 +114,12 @@ const UserManagementTabs: FC<Props> = (props) => {
 
   const tabs = generateTabs(permissions, tabData);
 
-  const getCurrentTab = () => {
+  const getCurrentTabIndex = (): number => {
     const path = getCurrentPath();
     return tabs.findIndex((tab) => tab.href === path);
   };
 
-  const getTabLabel = (tab: Tab) => {
+  const getTabLabel = (tab: TabData): string | JSX.Element => {
     if (tab.count) {
       return (
         <Badge
@@ -130,17 +130,24 @@ const UserManagementTabs: FC<Props> = (props) => {
           {intl.formatMessage(tab.label)}
         </Badge>
       );
-    } else {
-      return intl.formatMessage(tab.label);
     }
+    return intl.formatMessage(tab.label);
   };
 
   const managementTabs = (
     <>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={getCurrentTab()} variant="scrollable" scrollButtons="auto">
-          {tabs.map((tab, index) => (
-            <LinkTab key={index} label={getTabLabel(tab)} href={tab.href} />
+        <Tabs
+          value={getCurrentTabIndex()}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {tabs.map((tab) => (
+            <LinkTab
+              key={tab.label.id}
+              label={getTabLabel(tab)}
+              href={tab.href}
+            />
           ))}
         </Tabs>
       </Box>

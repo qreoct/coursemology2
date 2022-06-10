@@ -13,9 +13,9 @@ import {
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { AppDispatch } from 'types/store';
-import { upgradeToStaff } from '../../operations';
 import sharedConstants from 'lib/constants/sharedConstants';
 import { CourseUserData } from 'types/course/course_users';
+import { upgradeToStaff } from '../../operations';
 
 interface Props extends WrappedComponentProps {
   students: CourseUserData[];
@@ -63,18 +63,18 @@ const UpgradeToStaff: FC<Props> = (props) => {
       .catch((error) => {
         toast.error(
           intl.formatMessage(translations.upgradeFailure, {
-            error: error,
+            error,
           }),
         );
         throw error;
       });
   };
 
-  const handleNameChange = (_event, newValue) => {
+  const handleNameChange = (_event, newValue): void => {
     setUser(newValue);
   };
 
-  const handleRoleChange = (event) => {
+  const handleRoleChange = (event): void => {
     setRole(event.target.value);
   };
 
@@ -92,13 +92,14 @@ const UpgradeToStaff: FC<Props> = (props) => {
           value={user}
           onChange={handleNameChange}
           options={students}
-          getOptionLabel={(option) => option.name}
-          renderOption={(props, option) => (
+          getOptionLabel={(option): string => option.name}
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          renderOption={(props, option): JSX.Element => (
             <Box component="li" {...props}>
               {option.name}
             </Box>
           )}
-          renderInput={(params) => (
+          renderInput={(params): JSX.Element => (
             <TextField {...params} label="Name" variant="standard" />
           )}
           sx={{ width: '25%', marginRight: '12px' }}
@@ -112,6 +113,7 @@ const UpgradeToStaff: FC<Props> = (props) => {
           onChange={handleRoleChange}
           sx={{ width: '25%', marginRight: '12px' }}
         >
+          {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
           {sharedConstants.STAFF_ROLES.map((role) => (
             <MenuItem
               key={`upgrade-student-role-${role.value}`}

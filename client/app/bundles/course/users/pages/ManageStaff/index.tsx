@@ -20,17 +20,6 @@ import UserManagementButtons from '../../components/buttons/UserManagementButton
 
 type Props = WrappedComponentProps;
 
-// const styles = {
-//   courseUserImage: {
-//     height: 75,
-//     width: 75,
-//     marginTop: '1em',
-//   },
-//   courseUserName: {
-//     paddingTop: '2em',
-//   },
-// };
-
 const translations = defineMessages({
   manageUsersHeader: {
     id: 'course.users.manage.header',
@@ -91,8 +80,8 @@ const ManageStaff: FC<Props> = (props) => {
           title="Staff"
           users={staff}
           permissions={permissions}
-          manageStaff={true}
-          renderRowActionComponent={(user) => (
+          manageStaff
+          renderRowActionComponent={(user): JSX.Element => (
             <UserManagementButtons user={user} />
           )}
         />

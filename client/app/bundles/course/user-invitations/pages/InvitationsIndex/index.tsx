@@ -3,18 +3,18 @@ import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, AppState } from 'types/store';
+import LoadingIndicator from 'lib/components/LoadingIndicator';
+import { Box, Typography } from '@mui/material';
+import PageHeader from 'lib/components/pages/PageHeader';
 import {
   getManageCourseUsersTabData,
   getManageCourseUserPermissions,
   getAllInvitationsEntities,
 } from '../../selectors';
 import UserManagementTabs from '../../../users/components/navigation/UserManagementTabs';
-import LoadingIndicator from 'lib/components/LoadingIndicator';
 import { fetchInvitations } from '../../operations';
-import { Box, Typography } from '@mui/material';
 import UserInvitationsTable from '../../components/tables/UserInvitationsTable';
 import InvitationsBarChart from '../../components/misc/InvitationsBarChart';
-import PageHeader from 'lib/components/pages/PageHeader';
 import PendingInvitationsButtons from '../../components/buttons/PendingInvitationsButtons';
 
 type Props = WrappedComponentProps;
@@ -90,8 +90,8 @@ const InviteUsers: FC<Props> = (props) => {
         <UserInvitationsTable
           title="Pending Invitations"
           invitations={pendingInvitations}
-          pendingInvitations={true}
-          renderRowActionComponent={(invitation) => (
+          pendingInvitations
+          renderRowActionComponent={(invitation): JSX.Element => (
             <PendingInvitationsButtons invitation={invitation} />
           )}
         />
@@ -101,7 +101,7 @@ const InviteUsers: FC<Props> = (props) => {
         <UserInvitationsTable
           title="Accepted Invitations"
           invitations={acceptedInvitations}
-          acceptedInvitations={true}
+          acceptedInvitations
         />
       )}
     </Box>

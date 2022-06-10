@@ -103,7 +103,7 @@ export default class UsersAPI extends BaseCourseAPI {
     const params = {
       course_user: {
         id: userId,
-        role: role,
+        role,
       },
     };
 
@@ -113,4 +113,3 @@ export default class UsersAPI extends BaseCourseAPI {
     );
   }
 }
-

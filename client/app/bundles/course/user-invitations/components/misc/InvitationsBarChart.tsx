@@ -13,7 +13,10 @@ const translations = defineMessages({
   },
 });
 
-const InvitationsBarChart = (props) => {
+const InvitationsBarChart = (props: {
+  accepted: any;
+  pending: any;
+}): JSX.Element => {
   const { accepted, pending } = props;
   const data = [
     {
