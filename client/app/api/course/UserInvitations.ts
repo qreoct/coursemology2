@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import {
   ManageCourseUsersPermissions,
-  ManageCourseUsersTabData,
+  ManageCourseUsersSharedData,
 } from 'types/course/course_users';
 import { InvitationData } from 'types/course/user_invitations';
 import SubmissionsAPI from './Assessment/Submissions';
@@ -17,7 +17,7 @@ export default class UserInvitationsAPI extends BaseCourseAPI {
     AxiosResponse<{
       invitations: InvitationData[];
       permissions: ManageCourseUsersPermissions;
-      manageCourseUsersData: ManageCourseUsersTabData;
+      manageCourseUsersData: ManageCourseUsersSharedData;
     }>
   > {
     return this.getClient().get(`${this._baseUrlPrefix}/user_invitations`);

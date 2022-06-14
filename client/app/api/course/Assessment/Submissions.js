@@ -135,7 +135,6 @@ export default class SubmissionsAPI extends BaseAssessmentAPI {
     }
 
     if (data instanceof Array) {
-      console.log('data is array! data:', data);
       if (data.length === 0) {
         formData.append(`${prefix}[]`, null);
       }
@@ -144,7 +143,6 @@ export default class SubmissionsAPI extends BaseAssessmentAPI {
       });
     } else if (typeof data === 'object' && !(data instanceof File)) {
       Object.keys(data).forEach((key) => {
-        console.log(`type is object! writing with prefix ${prefix}[${key}]`);
         SubmissionsAPI.appendFormData(formData, data[key], `${prefix}[${key}]`);
       });
     } else {

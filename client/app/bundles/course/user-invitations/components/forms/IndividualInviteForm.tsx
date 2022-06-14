@@ -1,16 +1,17 @@
 import ErrorText from 'lib/components/ErrorText';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { toast } from 'react-toastify';
 import { ManageCourseUsersPermissions } from 'types/course/course_users';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from 'types/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, AppState } from 'types/store';
 import { IndividualInvites } from 'types/course/user_invitations';
 import IndividualInvitations from './IndividualInvitations';
 import { inviteUsersFromForm } from '../../operations';
+import { getManageCourseUsersSharedData } from '../../selectors';
 // import formTranslations from 'lib/translations/form'
 
 interface Props extends WrappedComponentProps {
@@ -43,25 +44,14 @@ const validationSchema = yup.object({
   ),
 });
 
-// const validationSchema = yup.object({
-//   invitations: yup
-//     .array()
-//     .of(
-//       yup.object({
-//         email: yup.string().email(translations.emailFormat.id),
-//       }),
-//     )
-//     .test('required', { ...translations.allFilled }, function () {
-//       if (countUnfilledInvitations(this.parent.invitations) > 0) {
-//         return false;
-//       }
-//       return true;
-//     }),
-// });
-
 const IndividualInviteForm: FC<Props> = (props) => {
   const { permissions } = props;
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const sharedData = useSelector((state: AppState) =>
+    getManageCourseUsersSharedData(state),
+  );
+  const defaultTimelineAlgorithm = sharedData.defaultTimelineAlgorithm;
   const initialValues = {
     invitations: [
       {
@@ -70,7 +60,7 @@ const IndividualInviteForm: FC<Props> = (props) => {
         role: 'student',
         phantom: false,
         ...(permissions.canManagePersonalTimes && {
-          timelineAlgorithm: 'fixed',
+          timelineAlgorithm: defaultTimelineAlgorithm,
         }),
       },
     ],
@@ -124,6 +114,7 @@ const IndividualInviteForm: FC<Props> = (props) => {
   const onSubmit = (data: any): Promise<void> => {
     console.log('submitting!');
     console.log('sending data onsubmit', data);
+    setIsLoading(true);
     return dispatch(inviteUsersFromForm(data))
       .then((response) => {
         const { success, warning } = response;
@@ -132,6 +123,7 @@ const IndividualInviteForm: FC<Props> = (props) => {
       })
       .finally(() => {
         reset(initialValues);
+        setIsLoading(false);
       });
   };
 
@@ -144,6 +136,7 @@ const IndividualInviteForm: FC<Props> = (props) => {
     >
       <ErrorText errors={errors} />
       <IndividualInvitations
+        isLoading={isLoading}
         permissions={permissions}
         fieldsConfig={{
           control,

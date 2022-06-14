@@ -20,14 +20,14 @@ const InvitationsBarChart = (props: {
   const { accepted, pending } = props;
   const data = [
     {
-      count: accepted,
-      color: palette.invitationStatus.accepted,
-      label: <FormattedMessage {...translations.accepted} />,
-    },
-    {
       count: pending,
       color: palette.invitationStatus.pending,
       label: <FormattedMessage {...translations.pending} />,
+    },
+    {
+      count: accepted,
+      color: palette.invitationStatus.accepted,
+      label: <FormattedMessage {...translations.accepted} />,
     },
   ];
 

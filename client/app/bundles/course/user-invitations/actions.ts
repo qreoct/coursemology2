@@ -1,6 +1,6 @@
 import {
   ManageCourseUsersPermissions,
-  ManageCourseUsersTabData,
+  ManageCourseUsersSharedData,
 } from 'types/course/course_users';
 import { InvitationData } from 'types/course/user_invitations';
 import {
@@ -15,7 +15,7 @@ import {
 export function saveInvitationList(
   invitationList: InvitationData[],
   manageCourseUsersPermissions: ManageCourseUsersPermissions,
-  manageCourseUsersData: ManageCourseUsersTabData,
+  manageCourseUsersData: ManageCourseUsersSharedData,
 ): SaveInvitationListAction {
   return {
     type: SAVE_INVITATION_LIST,

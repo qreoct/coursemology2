@@ -37,24 +37,6 @@ const formatInvitations = (invitations): FormData => {
     );
   });
   return payload;
-
-  // console.log('invitations:', invitations);
-  // const newInvitations: CourseInvitationPostData = {
-  //   invitations_attributes: [],
-  // };
-  // Object.values(invitations).forEach((invite: any) => {
-  //   const newInvite = {
-  //     name: invite.name,
-  //     email: invite.email,
-  //     role: invite.role,
-  //     phantom: invite.phantom,
-  //     timeline_algorithm: invite.timelineAlgori,
-  //   };
-  //   console.log('newInvite:', newInvite);
-  //   newInvitations.invitations_attributes.push(newInvite);
-  // });
-  // console.log('newInvitations:', newInvitations);
-  // return newInvitations;
 };
 
 export function fetchInvitations(): Operation<void> {
@@ -81,17 +63,22 @@ export function inviteUsersFromFile(
 ): Operation<InvitationMessage> {
   const file = formData.file;
   return async (dispatch) =>
-    CourseAPI.userInvitations.invite(file).then((response) => {
-      const data = response.data;
-      dispatch(
-        actions.saveInvitationList(
-          data.invitations,
-          data.permissions,
-          data.manageCourseUsersData,
-        ),
-      );
-      return data.message;
-    });
+    CourseAPI.userInvitations
+      .invite(file)
+      .then((response) => {
+        const data = response.data;
+        dispatch(
+          actions.saveInvitationList(
+            data.invitations,
+            data.permissions,
+            data.manageCourseUsersData,
+          ),
+        );
+        return data.message;
+      })
+      .catch((error) => {
+        throw error;
+      });
 }
 
 export function inviteUsersFromForm(

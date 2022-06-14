@@ -1,6 +1,6 @@
 import {
   ManageCourseUsersPermissions,
-  ManageCourseUsersTabData,
+  ManageCourseUsersSharedData,
 } from 'types/course/course_users';
 import {
   InvitationData,
@@ -21,7 +21,7 @@ export interface SaveInvitationListAction {
   type: typeof SAVE_INVITATION_LIST;
   invitationList: InvitationData[];
   manageCourseUsersPermissions: ManageCourseUsersPermissions;
-  manageCourseUsersData: ManageCourseUsersTabData;
+  manageCourseUsersData: ManageCourseUsersSharedData;
 }
 
 export interface DeleteInvitationAction {
@@ -43,6 +43,6 @@ export type InvitationsActionType =
 export interface InvitationsState {
   invitations: EntityStore<InvitationEntity, InvitationEntity>;
   permissions: ManageCourseUsersPermissions;
-  manageCourseUsersData: ManageCourseUsersTabData;
+  manageCourseUsersData: ManageCourseUsersSharedData;
   courseRegistrationKey: string;
 }

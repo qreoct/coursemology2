@@ -30,6 +30,7 @@ const initialState: UsersState = {
   manageCourseUsersData: {
     requestsCount: 0,
     invitationsCount: 0,
+    defaultTimelineAlgorithm: 'fixed',
   },
 };
 

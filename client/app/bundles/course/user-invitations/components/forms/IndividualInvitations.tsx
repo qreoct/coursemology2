@@ -1,15 +1,20 @@
 import { FC } from 'react';
 import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { Button, Divider, Grid } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import {
   IndividualInviteRowData,
   IndividualInvites,
 } from 'types/course/user_invitations';
 import { ManageCourseUsersPermissions } from 'types/course/course_users';
 import { UseFieldArrayAppend, UseFieldArrayRemove } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { AppState } from 'types/store';
 import IndividualInvitation from './IndividualInvitation';
+import { getManageCourseUsersSharedData } from '../../selectors';
 
 interface Props extends WrappedComponentProps {
+  isLoading: boolean;
   permissions: ManageCourseUsersPermissions;
   fieldsConfig: {
     control: any;
@@ -31,8 +36,13 @@ const translations = defineMessages({
 });
 
 const IndividualInvitations: FC<Props> = (props) => {
-  const { permissions, fieldsConfig, intl } = props;
+  const { isLoading, permissions, fieldsConfig, intl } = props;
   const { append, fields } = fieldsConfig;
+
+  const sharedData = useSelector((state: AppState) =>
+    getManageCourseUsersSharedData(state),
+  );
+  const defaultTimelineAlgorithm = sharedData.defaultTimelineAlgorithm;
 
   return (
     <>
@@ -47,8 +57,9 @@ const IndividualInvitations: FC<Props> = (props) => {
 
       <Divider sx={{ margin: '12px 0px' }} />
       <Grid container alignItems="center">
-        <Button
+        <LoadingButton
           className="btn-submit"
+          loading={isLoading}
           variant="contained"
           sx={{ marginRight: '4px' }}
           form="invite-users-individual-form"
@@ -56,7 +67,7 @@ const IndividualInvitations: FC<Props> = (props) => {
           type="submit"
         >
           {intl.formatMessage(translations.invite)}
-        </Button>
+        </LoadingButton>
         <Button
           color="primary"
           onClick={(): void =>
@@ -66,7 +77,7 @@ const IndividualInvitations: FC<Props> = (props) => {
               role: 'student',
               phantom: false,
               ...(permissions.canManagePersonalTimes && {
-                timelineAlgorithm: 'fixed',
+                timelineAlgorithm: defaultTimelineAlgorithm,
               }),
             })
           }

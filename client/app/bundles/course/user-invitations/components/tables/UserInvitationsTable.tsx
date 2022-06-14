@@ -11,6 +11,7 @@ import Note from 'lib/components/Note';
 import rebuildObjectFromRow from 'lib/helpers/mui-datatables-helpers';
 import { InvitationEntity } from 'types/course/user_invitations';
 import sharedConstants from 'lib/constants/sharedConstants';
+import tableTranslations from 'lib/components/tables/translations';
 import ResendInvitationsButton from '../buttons/ResendAllInvitationsButton';
 
 interface Props extends WrappedComponentProps {
@@ -25,42 +26,6 @@ const translations = defineMessages({
   noInvitations: {
     id: 'course.userInvitations.components.tables.UserInvitationsTable.noInvitations',
     defaultMessage: 'There are no {invitationType}',
-  },
-  idColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.id',
-    defaultMessage: 'id',
-  },
-  nameColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.name',
-    defaultMessage: 'Name',
-  },
-  emailColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.email',
-    defaultMessage: 'Email',
-  },
-  roleColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.role',
-    defaultMessage: 'Role',
-  },
-  phantomColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.phantom',
-    defaultMessage: 'Phantom',
-  },
-  invitationCodeColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.invitationCode',
-    defaultMessage: 'Invitation Code',
-  },
-  sentAtColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.sentAt',
-    defaultMessage: 'Invitation Sent At',
-  },
-  acceptedAtColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.acceptedAt',
-    defaultMessage: 'Invitation Accepted At',
-  },
-  actionsColumn: {
-    id: 'course.userInvitations.components.tables.UserInvitationsTable.column.acceptedAt',
-    defaultMessage: 'Actions',
   },
 });
 
@@ -96,6 +61,9 @@ const UserInvitationsTable: FC<Props> = (props) => {
     rowsPerPageOptions: [15, 30, 50],
     search: true,
     selectableRows: 'none',
+    setTableProps: (): object => {
+      return { size: 'small' };
+    },
     setRowProps: (
       _row: Array<any>,
       dataIndex: number,
@@ -118,7 +86,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
   const columns: any = [
     {
       name: 'id',
-      label: intl.formatMessage(translations.idColumn),
+      label: intl.formatMessage(tableTranslations.id),
       options: {
         display: false,
         filter: false,
@@ -127,7 +95,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
     },
     {
       name: 'name',
-      label: intl.formatMessage(translations.nameColumn),
+      label: intl.formatMessage(tableTranslations.name),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -142,7 +110,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
     },
     {
       name: 'email',
-      label: intl.formatMessage(translations.emailColumn),
+      label: intl.formatMessage(tableTranslations.email),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -157,7 +125,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
     },
     {
       name: 'role',
-      label: intl.formatMessage(translations.roleColumn),
+      label: intl.formatMessage(tableTranslations.role),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -176,7 +144,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
     },
     {
       name: 'phantom',
-      label: intl.formatMessage(translations.phantomColumn),
+      label: intl.formatMessage(tableTranslations.phantom),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -191,7 +159,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
     },
     {
       name: 'invitationCode',
-      label: intl.formatMessage(translations.invitationCodeColumn),
+      label: intl.formatMessage(tableTranslations.invitationCode),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -209,7 +177,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
   if (pendingInvitations) {
     columns.push({
       name: 'sentAt',
-      label: intl.formatMessage(translations.sentAtColumn),
+      label: intl.formatMessage(tableTranslations.invitationSentAt),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -226,8 +194,8 @@ const UserInvitationsTable: FC<Props> = (props) => {
 
   if (acceptedInvitations) {
     columns.push({
-      name: 'sentAt',
-      label: intl.formatMessage(translations.acceptedAtColumn),
+      name: 'acceptedAt',
+      label: intl.formatMessage(tableTranslations.invitationAcceptedAt),
       options: {
         alignCenter: false,
         customBodyRenderLite: (dataIndex: number): JSX.Element => {
@@ -245,7 +213,7 @@ const UserInvitationsTable: FC<Props> = (props) => {
   if (renderRowActionComponent) {
     columns.push({
       name: 'actions',
-      label: intl.formatMessage(translations.actionsColumn),
+      label: intl.formatMessage(tableTranslations.actions),
       options: {
         empty: true,
         sort: false,

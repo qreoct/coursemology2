@@ -3,14 +3,14 @@ import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { Badge, Box, Tab, Tabs } from '@mui/material';
 import {
   ManageCourseUsersPermissions,
-  ManageCourseUsersTabData,
+  ManageCourseUsersSharedData,
 } from 'types/course/course_users';
 import { getCurrentPath, getCourseId } from 'lib/helpers/url-helpers';
 import { getCourseURL } from 'lib/helpers/url-builders';
 
 interface Props extends WrappedComponentProps {
   permissions: ManageCourseUsersPermissions;
-  tabData: ManageCourseUsersTabData;
+  sharedData: ManageCourseUsersSharedData;
 }
 
 const translations = defineMessages({
@@ -46,6 +46,13 @@ const styles = {
       outline: 0,
     },
   },
+  tabsIndicatorStyle: {
+    // to show tab indicator on firefox
+    '& .MuiTabs-indicator': {
+      bottom: 'auto',
+    },
+    minHeight: '50px',
+  },
 };
 
 interface TabData {
@@ -72,6 +79,7 @@ const allTabs = {
   enrolRequestsTab: {
     label: translations.enrolRequestsTitle,
     href: `${courseUrl}/enrol_requests`,
+    count: 0,
   },
   inviteTab: {
     label: translations.inviteTitle,
@@ -80,6 +88,7 @@ const allTabs = {
   userInvitationsTab: {
     label: translations.userInvitationsTitle,
     href: `${courseUrl}/user_invitations`,
+    count: 0,
   },
   personalTimesTab: {
     label: translations.personalTimesTitle,
@@ -89,7 +98,7 @@ const allTabs = {
 
 const generateTabs = (
   permissions: ManageCourseUsersPermissions,
-  tabData: ManageCourseUsersTabData,
+  sharedData: ManageCourseUsersSharedData,
 ): TabData[] => {
   const tabs: TabData[] = [];
   if (permissions.canManageCourseUsers) {
@@ -97,11 +106,11 @@ const generateTabs = (
     tabs.push(allTabs.staffTab);
   }
   if (permissions.canManageEnrolRequests) {
-    allTabs.enrolRequestsTab.count = tabData.requestsCount;
+    allTabs.enrolRequestsTab.count = sharedData.requestsCount;
     tabs.push(allTabs.enrolRequestsTab);
   }
   tabs.push(allTabs.inviteTab);
-  allTabs.userInvitationsTab.count = tabData.invitationsCount;
+  allTabs.userInvitationsTab.count = sharedData.invitationsCount;
   tabs.push(allTabs.userInvitationsTab);
   if (permissions.canManagePersonalTimes) {
     tabs.push(allTabs.personalTimesTab);
@@ -110,13 +119,16 @@ const generateTabs = (
 };
 
 const UserManagementTabs: FC<Props> = (props) => {
-  const { permissions, tabData, intl } = props;
+  const { permissions, sharedData, intl } = props;
 
-  const tabs = generateTabs(permissions, tabData);
+  const tabs = generateTabs(permissions, sharedData);
 
   const getCurrentTabIndex = (): number => {
     const path = getCurrentPath();
-    return tabs.findIndex((tab) => tab.href === path);
+    console.log('path:', path);
+    const res = tabs.findIndex((tab) => tab.href === path);
+    console.log('foundindex:', res);
+    return res === -1 ? 0 : res;
   };
 
   const getTabLabel = (tab: TabData): string | JSX.Element => {
@@ -141,6 +153,7 @@ const UserManagementTabs: FC<Props> = (props) => {
           value={getCurrentTabIndex()}
           variant="scrollable"
           scrollButtons="auto"
+          sx={styles.tabsIndicatorStyle}
         >
           {tabs.map((tab) => (
             <LinkTab
