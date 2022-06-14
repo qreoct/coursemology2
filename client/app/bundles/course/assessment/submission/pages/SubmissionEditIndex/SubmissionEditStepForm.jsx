@@ -23,6 +23,7 @@ import { blue, green, lightBlue, red } from '@mui/material/colors';
 import ConfirmationDialog from 'lib/components/ConfirmationDialog';
 import ErrorText from 'lib/components/ErrorText';
 import {
+  answerStatusShape,
   explanationShape,
   questionShape,
   historyQuestionShape,
@@ -73,6 +74,7 @@ const isLastQuestion = (questionIds, stepIndex) =>
 
 const SubmissionEditStepForm = (props) => {
   const {
+    answerStatus,
     allConsideredCorrect,
     allowPartialSubmission,
     attempting,
@@ -118,8 +120,9 @@ const SubmissionEditStepForm = (props) => {
     getValues,
     handleSubmit,
     reset,
+    resetField,
     setValue,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, dirtyFields },
   } = methods;
 
   useEffect(() => {
@@ -137,6 +140,12 @@ const SubmissionEditStepForm = (props) => {
     }
   };
 
+  const isOutdated = (question) => {
+    const isBackendOutdated = !answerStatus[question.id].isLatestAnswer;
+    const isFrontendDirty = question.answerId in dirtyFields;
+    return isBackendOutdated || isFrontendDirty;
+  };
+
   const shouldDisableContinueButton = () => {
     const questionId = questionIds[stepIndex];
 
@@ -150,6 +159,10 @@ const SubmissionEditStepForm = (props) => {
 
     return showMcqAnswer;
   };
+
+  const shouldDisableFinaliseButton = () =>
+    isSaving ||
+    (!allowPartialSubmission && isDirty && Object.keys(dirtyFields).length > 0);
 
   const shouldRenderContinueButton = () =>
     !isLastQuestion(questionIds, stepIndex);
@@ -209,6 +222,10 @@ const SubmissionEditStepForm = (props) => {
         return null;
       }
 
+      if (question.autogradable && isOutdated(question)) {
+        return null;
+      }
+
       let title = '';
       if (explanation.correct) {
         if (question.autogradable) {
@@ -253,12 +270,13 @@ const SubmissionEditStepForm = (props) => {
   };
 
   const renderFinaliseButton = () => {
+    const disabled = shouldDisableFinaliseButton();
     if (attempting && (allowPartialSubmission || allConsideredCorrect)) {
       return (
         <Button
           variant="contained"
           color="secondary"
-          disabled={isSaving}
+          disabled={disabled}
           onClick={() => setSubmitConfirmation(true)}
           style={styles.formButton}
         >
@@ -378,7 +396,12 @@ const SubmissionEditStepForm = (props) => {
         <Hotkeys
           keyName="command+enter,control+enter"
           onKeyDown={() =>
-            onSubmitAnswer(answerId, getValues(`${answerId}`), setValue)
+            onSubmitAnswer(
+              answerId,
+              getValues(`${answerId}`),
+              setValue,
+              resetField,
+            )
           }
           disabled={isAutograding || isResetting || isSaving}
           filter={() => true}
@@ -389,7 +412,12 @@ const SubmissionEditStepForm = (props) => {
             color="secondary"
             disabled={isAutograding || isResetting || isSaving}
             onClick={() =>
-              onSubmitAnswer(answerId, getValues(`${answerId}`), setValue)
+              onSubmitAnswer(
+                answerId,
+                getValues(`${answerId}`),
+                setValue,
+                resetField,
+              )
             }
             style={styles.formButton}
           >
@@ -502,7 +530,11 @@ const SubmissionEditStepForm = (props) => {
         {questionIds.map((questionId, index) => {
           let stepButtonColor = '';
           const isCurrentQuestion = index === stepIndex;
-          if (explanations[questionId] && explanations[questionId].correct) {
+          if (
+            explanations[questionId] &&
+            explanations[questionId].correct &&
+            !isOutdated(questions[questionId])
+          ) {
             stepButtonColor = isCurrentQuestion ? green[700] : green[300];
           } else {
             stepButtonColor = isCurrentQuestion ? blue[800] : lightBlue[400];
@@ -576,6 +608,7 @@ SubmissionEditStepForm.propTypes = {
   attempting: PropTypes.bool.isRequired,
   published: PropTypes.bool.isRequired,
 
+  answerStatus: PropTypes.objectOf(answerStatusShape),
   explanations: PropTypes.objectOf(explanationShape),
   allConsideredCorrect: PropTypes.bool.isRequired,
   allowPartialSubmission: PropTypes.bool.isRequired,
