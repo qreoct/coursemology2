@@ -12,17 +12,31 @@ import propsAreEqual from './utils/propsAreEqual';
 
 const styles = {
   selectFieldStyle: {
-    margin: '14px 10px 12px 0px',
+    margin: '8px 10px 8px 0px',
   },
   errorText: { margin: 0 },
 };
 
 const FormSelectField = (props) => {
-  const { field, fieldState, disabled, label, options, renderIf, ...custom } =
-    props;
+  const {
+    field,
+    fieldState,
+    disabled,
+    label,
+    options,
+    renderIf,
+    sx,
+    ...custom
+  } = props;
   const isError = !!fieldState.error;
   if (!renderIf) {
     return null;
+  }
+  if (sx) {
+    styles.selectFieldStyle = {
+      ...styles.selectFieldStyle,
+      ...sx,
+    };
   }
 
   return (
@@ -66,6 +80,7 @@ FormSelectField.propTypes = {
   disabled: PropTypes.bool,
   label: PropTypes.node,
   options: PropTypes.arrayOf(PropTypes.object),
+  sx: PropTypes.object,
   renderIf: PropTypes.bool,
 };
 

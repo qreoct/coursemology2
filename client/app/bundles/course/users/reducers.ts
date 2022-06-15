@@ -7,16 +7,31 @@ import {
   createEntityStore,
   saveEntityToStore,
   saveListToStore,
+  saveDetailedListToStore,
+  removeFromStore,
 } from 'utilities/store';
 import {
   UsersState,
   UsersActionType,
   SAVE_USER,
   SAVE_USERS_LIST,
+  SAVE_MANAGE_USERS_LIST,
+  DELETE_USER,
 } from './types';
 
 const initialState: UsersState = {
   users: createEntityStore(),
+  permissions: {
+    canManageCourseUsers: false,
+    canManageEnrolRequests: false,
+    canManagePersonalTimes: false,
+    canRegisterWithCode: false,
+  },
+  manageCourseUsersData: {
+    requestsCount: 0,
+    invitationsCount: 0,
+    defaultTimelineAlgorithm: 'fixed',
+  },
 };
 
 const reducer = produce((draft: UsersState, action: UsersActionType) => {
@@ -33,6 +48,23 @@ const reducer = produce((draft: UsersState, action: UsersActionType) => {
       const userData = action.user;
       const userEntity: CourseUserEntity = { ...userData };
       saveEntityToStore(draft.users, userEntity);
+      break;
+    }
+    case SAVE_MANAGE_USERS_LIST: {
+      const usersList = action.userList;
+      const entityList: CourseUserEntity[] = usersList.map((data) => ({
+        ...data,
+      }));
+      saveDetailedListToStore(draft.users, entityList);
+      draft.permissions = action.manageCourseUsersPermissions;
+      draft.manageCourseUsersData = action.manageCourseUsersData;
+      break;
+    }
+    case DELETE_USER: {
+      const userId = action.userId;
+      if (draft.users.byId[userId]) {
+        removeFromStore(draft.users, userId);
+      }
       break;
     }
     default: {

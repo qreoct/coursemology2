@@ -1,21 +1,30 @@
+import { Permissions } from 'types';
 import type {
   AchievementListData,
   AchievementMiniEntity,
 } from './achievements';
 import { SkillBranchData, SkillBranchEntity } from './assessment/skills/skills';
+import { TimelineAlgorithm } from './personal_times';
+
+export type ManageCourseUsersPermissions = Permissions<
+  | 'canManageCourseUsers'
+  | 'canManageEnrolRequests'
+  | 'canManagePersonalTimes'
+  | 'canRegisterWithCode'
+>;
 
 export interface CourseUserListData {
   id: number;
   name: string;
   imageUrl: string;
-  phantom?: boolean;
+  phantom: boolean;
 }
 
 export interface CourseUserMiniEntity {
   id: number;
   name: string;
   imageUrl: string;
-  phantom?: boolean;
+  phantom: boolean;
 }
 
 /**
@@ -30,6 +39,7 @@ export interface CourseUserData extends CourseUserListData {
   experiencePointsRecordsUrl?: string;
   manageEmailSubscriptionUrl?: string;
   skillBranches?: SkillBranchData[];
+  timelineAlgorithm?: TimelineAlgorithm;
 }
 
 export interface CourseUserEntity extends CourseUserMiniEntity {
@@ -41,4 +51,37 @@ export interface CourseUserEntity extends CourseUserMiniEntity {
   experiencePointsRecordsUrl?: string;
   manageEmailSubscriptionUrl?: string;
   skillBranches?: SkillBranchEntity[];
+  timelineAlgorithm?: TimelineAlgorithm;
+}
+
+export interface CourseUserFormData {
+  id: number;
+  name: string;
+  phantom: boolean;
+  timelineAlgorithm?: TimelineAlgorithm;
+  role?: string;
+}
+
+/**
+ * Data types for PATCH course user via /update
+ */
+export interface UpdateCourseUserPatchData {
+  course_user: {
+    name: string;
+    phantom: boolean;
+    timeline_algorithm?: TimelineAlgorithm;
+    role?: string;
+  };
+}
+
+/**
+ * Shared data for Manage Course Users component
+ * - Count of enrol requests and invitations (to render badges on tabs)
+ * - Default course timeline algorithm (for default selection)
+ * We only need counts, as certain pages don't retrieve enrol requests nor invitations
+ */
+export interface ManageCourseUsersSharedData {
+  requestsCount: number;
+  invitationsCount: number;
+  defaultTimelineAlgorithm: TimelineAlgorithm;
 }
